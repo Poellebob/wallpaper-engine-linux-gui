@@ -342,7 +342,7 @@ def main():
                 f.write("Type=Application\n")
                 f.write("Name=Wallpaper Engine Linux\n")
                 f.write(f"Exec=python3 '{os.path.abspath(__file__)}'\n")
-                f.write("Icon=preferences-desktop-wallpaper\n")
+                f.write(f"Icon={os.path.dirname(__file__) + "/icon.png"}\n")
                 f.write("Categories=Utility;\n")
                 print(f"Created .desktop file at {desktop_file}")
                 print(os.path.abspath(__file__))
@@ -356,6 +356,7 @@ def main():
         print("Options:")
         print("  --apply   Apply the selected wallpapers and exit")
         print("  --kill    Kill all running wallpaper engine processes and exit")
+        print("  --new-desktop Create or update the .desktop file for the application")
         print("  --help, -h Show this help message")
         sys.exit(0)
 
