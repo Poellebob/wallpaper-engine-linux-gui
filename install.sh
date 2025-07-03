@@ -66,4 +66,4 @@ esac
 echo "This will make a .desktop file for the wallpaper engine linux."
 echo "If you move the wallpaper engine linux folder, you will have to run this script again to update the .desktop file."
 echo "You can now run the wallpaper engine linux from the applications menu."
-python3 main.py --new-desktop --apply
+python3 main.py --setup
