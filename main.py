@@ -345,7 +345,6 @@ def main():
                 f.write(f"Icon={os.path.dirname(__file__) + "/icon.png"}\n")
                 f.write("Categories=Utility;\n")
                 print(f"Created .desktop file at {desktop_file}")
-                print(os.path.abspath(__file__))
             os.chmod(desktop_file, 0o755)
         except Exception as e:
             print(f"Failed to write .desktop file: {e}")
