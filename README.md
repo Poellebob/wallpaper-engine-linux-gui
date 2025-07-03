@@ -1,0 +1,18 @@
+# Requiremnts
+- linux-wallpaperengine 
+    - OpenGL 3.3 support
+    - CMake
+    - LZ4, Zlib
+    - SDL2
+    - FFmpeg
+    - X11 or Wayland
+    - Xrandr (for X11)
+    - GLFW3, GLEW, GLUT, GLM
+    - MPV
+    - PulseAudio
+    - FFTW3
+- Python 3
+- PyGObject (`python3-gi`)
+- GTK+ 3 (`libgtk-3-0`)
+- GdkPixbuf (`gir1.2-gdkpixbuf-2.0`)
+- python3-gobject
