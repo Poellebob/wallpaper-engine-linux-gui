@@ -12,8 +12,8 @@ fi
 
 install_arch() {
     echo "Detected Arch Linux."
-    echo "Installing wallpaperengine-linux-git and dependencies with yay..."
-    yay -Sy --needed wallpaperengine-linux-git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
+    echo "Installing linux-wallpaperengine-git and dependencies with yay..."
+    yay -Sy --needed linux-wallpaperengine-git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
 }
 
 install_debian() {
@@ -21,21 +21,21 @@ install_debian() {
     echo "Installing dependencies with apt..."
     sudo apt update
     sudo apt install -y python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection
-    echo "You must install wallpaperengine‑linux manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
+    echo "You must install linux-wallpaperengine manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
 }
 
 install_fedora() {
     echo "Detected Fedora."
     echo "Installing dependencies with dnf..."
     sudo dnf install -y python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection
-    echo "You must install wallpaperengine‑linux manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
+    echo "You must install linux-wallpaperengine manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
 }
 
 install_suse() {
     echo "Detected openSUSE."
     echo "Installing dependencies with zypper..."
     sudo zypper install -y python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4
-    echo "You must install wallpaperengine‑linux manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
+    echo "You must install linux-wallpaperengine manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
 }
 
 case "$OS_ID" in
