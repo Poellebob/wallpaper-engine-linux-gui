@@ -6,6 +6,8 @@ import glob
 import os
 import json
 import subprocess
+import signal
+import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.ini")
@@ -46,10 +48,22 @@ class CliFrontend(Gtk.Application):
         sidebar_box.append(self.selected_image_preview)
         self.selected_image_preview.show()
 
-        self.apply_button = Gtk.Button(label="Apply Wallpapers")
+        self.apply_button = Gtk.Button(label="Apply Wallpaper")
         sidebar_box.append(self.apply_button)
-        self.apply_button.connect("clicked", self.on_apply_wallpapers_clicked)
+        self.apply_button.connect("clicked", self.apply_walls)
         self.apply_button.show()
+
+        # Add "Kill Wallpapers" button under the apply button
+        self.kill_button = Gtk.Button(label="Kill")
+        sidebar_box.append(self.kill_button)
+        self.kill_button.connect("clicked", self.on_kill_wallpapers_clicked)
+        self.kill_button.show()
+
+        # Add "Clear" button under the kill button
+        self.clear_button = Gtk.Button(label="Clear")
+        sidebar_box.append(self.clear_button)
+        self.clear_button.connect("clicked", self.on_clear_wallpaper_clicked)
+        self.clear_button.show()
 
         self.populate_displays()
         self.display_selector.connect("changed", self.on_display_changed)
@@ -192,7 +206,24 @@ class CliFrontend(Gtk.Application):
         except Exception:
             self.selected_image_preview.clear()
 
-    def on_apply_wallpapers_clicked(self, button):
+    def apply_walls(self, button):
+        # Kill all running linux-wallpaperengine processes before starting new one
+        try:
+            import psutil
+            for proc in psutil.process_iter(['name', 'exe', 'cmdline']):
+                try:
+                    if (
+                        proc.info['name'] == 'linux-wallpaperengine'
+                        or (proc.info['exe'] and 'linux-wallpaperengine' in proc.info['exe'])
+                        or (proc.info['cmdline'] and any('linux-wallpaperengine' in arg for arg in proc.info['cmdline']))
+                    ):
+                        proc.kill()
+                except Exception:
+                    continue
+        except ImportError:
+            # Fallback if psutil is not installed
+            os.system("pkill -9 linux-wallpaperengine")
+
         # Get engine path and fps from config
         config = configparser.ConfigParser()
         config.read(CONFIG_PATH)
@@ -237,17 +268,17 @@ class CliFrontend(Gtk.Application):
             if not screen_id:
                 screen_id = f"Screen{i}"
 
-            print(f"Screen {i} ID: {screen_id}")
-            args += ["--screen-root", screen_id]
             bg_id = config_data.get(str(i), "")
             if bg_id:
-                args += ["--bg", bg_id]
+                print(f"Screen {i} ID: {screen_id}")
+                args += ["--screen-root", screen_id, "--bg", bg_id]
+            # If no bg_id, skip this screen
 
         # Add fps limit if set
         if fps:
-            args += ["--fps", str(fps)]
+            args += ["--fps", str(fps)] 
 
-        # If no backgrounds, do nothing
+        # If only engine_path is present, do nothing
         if len(args) == 1:
             print("No backgrounds selected.")
             return
@@ -258,7 +289,52 @@ class CliFrontend(Gtk.Application):
         except Exception as e:
             print("Failed to launch wallpaper engine:", e)
 
+    def on_kill_wallpapers_clicked(self, button):
+        try:
+            import psutil
+            for proc in psutil.process_iter(['name', 'exe', 'cmdline']):
+                try:
+                    if (
+                        proc.info['name'] == 'linux-wallpaperengine'
+                        or (proc.info['exe'] and 'linux-wallpaperengine' in proc.info['exe'])
+                        or (proc.info['cmdline'] and any('linux-wallpaperengine' in arg for arg in proc.info['cmdline']))
+                    ):
+                        proc.kill()
+                except Exception:
+                    continue
+        except ImportError:
+            os.system("pkill -9 linux-wallpaperengine")
+
+    def on_clear_wallpaper_clicked(self, button):
+        # Remove the wallpaper assignment for the selected screen
+        screen_id = self.display_selector.get_active()
+        if screen_id < 0:
+            return
+        config_data = {}
+        if os.path.isfile(USER_CONFIG_PATH):
+            try:
+                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
+                    config_data = json.load(f)
+            except Exception:
+                config_data = {}
+        if str(screen_id) in config_data:
+            del config_data[str(screen_id)]
+            with open(USER_CONFIG_PATH, "w", encoding="utf-8") as f:
+                json.dump(config_data, f, indent=2)
+        self.update_selected_image_preview()
+
 def main():
+    # Check for --apply flag
+    if "--apply" in sys.argv:
+        # Create a dummy class to call apply_walls without GUI
+        class DummyButton: pass
+        app = CliFrontend()
+        app.apply_walls(DummyButton())
+        # Explicitly exit the process, even if subprocess.Popen is used
+        print("Applied wallpapers and exited.")
+        sys.exit(0)
+        return
+    
     app = CliFrontend()
     app.run()
 
