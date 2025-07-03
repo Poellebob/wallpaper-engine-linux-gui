@@ -56,7 +56,7 @@ class CliFrontend(Gtk.Application):
         # Add "Kill Wallpapers" button under the apply button
         self.kill_button = Gtk.Button(label="Kill")
         sidebar_box.append(self.kill_button)
-        self.kill_button.connect("clicked", self.on_kill_wallpapers_clicked)
+        self.kill_button.connect("clicked", self.kill_walls)
         self.kill_button.show()
 
         # Add "Clear" button under the kill button
@@ -289,7 +289,7 @@ class CliFrontend(Gtk.Application):
         except Exception as e:
             print("Failed to launch wallpaper engine:", e)
 
-    def on_kill_wallpapers_clicked(self, button):
+    def kill_walls(self, button):
         try:
             import psutil
             for proc in psutil.process_iter(['name', 'exe', 'cmdline']):
@@ -325,16 +325,57 @@ class CliFrontend(Gtk.Application):
 
 def main():
     # Check for --apply flag
+
+    # Check if the .desktop file exists
+    desktop_file = os.path.expanduser("~/.local/share/applications/wallpaperengine-linux.desktop")
+    desktop_dir = os.path.dirname(desktop_file)
+    if not os.path.isdir(desktop_dir):
+        try:
+            os.makedirs(desktop_dir, exist_ok=True)
+        except Exception as e:
+            print(f"Failed to create directory {desktop_dir}: {e}")
+            sys.exit(1)
+    if not os.path.isfile(desktop_file) or "--new-desktop" in sys.argv:
+        try:
+            with open(desktop_file, "w", encoding="utf-8") as f:
+                f.write("[Desktop Entry]\n")
+                f.write("Type=Application\n")
+                f.write("Name=Wallpaper Engine Linux\n")
+                f.write(f"Exec=python3 '{os.path.abspath(__file__)}'\n")
+                f.write("Icon=preferences-desktop-wallpaper\n")
+                f.write("Categories=Utility;\n")
+                print(f"Created .desktop file at {desktop_file}")
+                print(os.path.abspath(__file__))
+            os.chmod(desktop_file, 0o755)
+        except Exception as e:
+            print(f"Failed to write .desktop file: {e}")
+            sys.exit(1)
+
+    if "--help" in sys.argv or "-h" in sys.argv:
+        print("Usage: python main.py [--apply] [--kill]")
+        print("Options:")
+        print("  --apply   Apply the selected wallpapers and exit")
+        print("  --kill    Kill all running wallpaper engine processes and exit")
+        print("  --help, -h Show this help message")
+        sys.exit(0)
+
     if "--apply" in sys.argv:
-        # Create a dummy class to call apply_walls without GUI
         class DummyButton: pass
         app = CliFrontend()
         app.apply_walls(DummyButton())
-        # Explicitly exit the process, even if subprocess.Popen is used
         print("Applied wallpapers and exited.")
         sys.exit(0)
         return
-    
+
+    # Check for --kill flag
+    if "--kill" in sys.argv:
+        class DummyButton: pass
+        app = CliFrontend()
+        app.kill_walls(DummyButton())
+        print("Killed wallpapers and exited.")
+        sys.exit(0)
+        return
+
     app = CliFrontend()
     app.run()
 
