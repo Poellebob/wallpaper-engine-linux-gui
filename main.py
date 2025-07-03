@@ -7,9 +7,10 @@ import os
 import json
 import subprocess
 
-CONFIG_PATH = "config.ini"
-GLADE_PATH = "ui.glade"
-USER_CONFIG_PATH = "configuration.json"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.ini")
+GLADE_PATH = os.path.join(SCRIPT_DIR, "ui.glade")
+USER_CONFIG_PATH = os.path.join(SCRIPT_DIR, "configuration.json")
 
 def get_walls_path():
     config = configparser.ConfigParser()
