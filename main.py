@@ -350,7 +350,7 @@ def main():
             print(f"Failed to write .desktop file: {e}")
             sys.exit(1)
     
-    if sys.argv or "--setup" in sys.argv:
+    if "--setup" in sys.argv:
         sys.exit(0)
         return
     
