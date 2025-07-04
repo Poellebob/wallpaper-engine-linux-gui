@@ -457,7 +457,7 @@ def main():
         except Exception as e:
             print(f"Failed to create directory {desktop_dir}: {e}")
             sys.exit(1)
-    if not os.path.isfile(desktop_file) or "--new-desktop" in sys.argv or "--setup" in sys.argv:
+    if not os.path.isfile(desktop_file) or "--new-desktop" in sys.argv:
         try:
             with open(desktop_file, "w", encoding="utf-8") as f:
                 f.write("[Desktop Entry]\n")
@@ -468,13 +468,10 @@ def main():
                 f.write("Categories=Utility;\n")
                 print(f"Created .desktop file at {desktop_file}")
             os.chmod(desktop_file, 0o755)
+            sys.exit(0)
         except Exception as e:
             print(f"Failed to write .desktop file: {e}")
             sys.exit(1)
-    
-    if "--setup" in sys.argv:
-        sys.exit(0)
-        return
     
     if "--help" in sys.argv or "-h" in sys.argv:
         print("Usage: python main.py [--apply] [--kill]")
