@@ -39,6 +39,14 @@ class CliFrontend(Gtk.Application):
         if hasattr(paned, "set_position"):
             paned.set_position(220)  # Sidebar width (preview image + padding)
 
+        config_data = {}
+        if os.path.isfile(USER_CONFIG_PATH):
+            try:
+                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
+                    config_data = json.load(f)
+            except Exception:
+                config_data = {}
+
         self.image_grid = self.builder.get_object("image_grid")
         self.populate_images()
 
@@ -53,17 +61,40 @@ class CliFrontend(Gtk.Application):
         self.apply_button.connect("clicked", self.apply_walls)
         self.apply_button.show()
 
+        # Add "Clear" button under the kill button
+        self.clear_button = Gtk.Button(label="Clear")
+        sidebar_box.append(self.clear_button)
+        self.clear_button.connect("clicked", self.on_clear_wallpaper_clicked)
+        self.clear_button.show()
+
         # Add "Kill Wallpapers" button under the apply button
         self.kill_button = Gtk.Button(label="Kill")
         sidebar_box.append(self.kill_button)
         self.kill_button.connect("clicked", self.kill_walls)
         self.kill_button.show()
 
-        # Add "Clear" button under the kill button
-        self.clear_button = Gtk.Button(label="Clear")
-        sidebar_box.append(self.clear_button)
-        self.clear_button.connect("clicked", self.on_clear_wallpaper_clicked)
-        self.clear_button.show()
+        # Add a separator with padding top and bottom
+        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        separator.set_margin_top(6)
+        separator.set_margin_bottom(6)
+        sidebar_box.append(separator)
+        separator.show()
+
+        # Add toggle button for mature content
+        self.mature_toggle = Gtk.ToggleButton(label="Mature Content")
+        self.mature_toggle.set_active(False)
+        self.mature_toggle.connect("toggled", self.toggle_mature_content)
+        sidebar_box.append(self.mature_toggle)
+        self.mature_toggle.show()
+
+        if "MATURE_CONTENT" in config_data:
+            self.mature_toggle.set_active(config_data["MATURE_CONTENT"])
+            if config_data["MATURE_CONTENT"]:
+                self.mature_toggle.set_css_classes(["suggested-action"])
+            else:
+                self.mature_toggle.set_css_classes(["destructive-action"])
+        else:
+            self.mature_toggle.set_css_classes(["destructive-action"])
 
         self.populate_displays()
         self.display_selector.connect("changed", self.on_display_changed)
@@ -73,6 +104,38 @@ class CliFrontend(Gtk.Application):
 
     def on_close_request(self, *args):
         self.quit()
+
+    def toggle_mature_content(self, button):
+        config_data = {}
+        if os.path.isfile(USER_CONFIG_PATH):
+            try:
+                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
+                    config_data = json.load(f)
+            except Exception:
+                config_data = {}
+        
+        if "MATURE_CONTENT" in config_data:
+            config_data["MATURE_CONTENT"] = not config_data["MATURE_CONTENT"]
+        else:
+            config_data["MATURE_CONTENT"] = True
+        
+        with open(USER_CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(config_data, f, indent=2)
+
+        # Update toggle button color
+        if config_data.get("MATURE_CONTENT", False):
+            self.mature_toggle.set_css_classes(["suggested-action"])
+        else:
+            self.mature_toggle.set_css_classes(["destructive-action"])
+
+        
+        # Refresh images based on new mature content setting
+        child = self.image_grid.get_first_child()
+        while child:
+            next_child = child.get_next_sibling()
+            self.image_grid.remove(child)
+            child = next_child
+        self.populate_images()    
 
     def populate_images(self):
         # Get UI scale (fallback to 1 if not set)
@@ -96,6 +159,18 @@ class CliFrontend(Gtk.Application):
                 preview_name = project_data.get("preview")
                 if not preview_name:
                     continue
+
+                if project_data.get("contentrating", False) == "Mature":
+                    config_data = {}
+                    if os.path.isfile(USER_CONFIG_PATH):
+                        try:
+                            with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
+                                config_data = json.load(f)
+                        except Exception:
+                            config_data = {}
+                    if not config_data.get("MATURE_CONTENT", False):
+                        continue
+
                 img_path = os.path.join(subdir, preview_name)
                 if not os.path.isfile(img_path):
                     continue
