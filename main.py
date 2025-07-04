@@ -147,12 +147,15 @@ class CliFrontend(Gtk.Application):
         if not workshop_base:
             return
         workshop_dir = os.path.expanduser(workshop_base)
-        subdirs = [os.path.join(workshop_dir, d) for d in os.listdir(workshop_dir) if os.path.isdir(os.path.join(workshop_dir, d))]
 
-        for subdir in subdirs:
-            project_json_path = os.path.join(subdir, "project.json")
-            if not os.path.isfile(project_json_path):
-                continue
+        # Use glob to recursively find all project.json files in all subdirectories
+        project_json_files = []
+        for root, dirs, files in os.walk(workshop_dir):
+            if "project.json" in files:
+                project_json_files.append(os.path.join(root, "project.json"))
+
+        for project_json_path in project_json_files:
+            subdir = os.path.dirname(project_json_path)
             try:
                 with open(project_json_path, "r", encoding="utf-8") as f:
                     project_data = json.load(f)
@@ -160,7 +163,27 @@ class CliFrontend(Gtk.Application):
                 if not preview_name:
                     continue
 
-                if project_data.get("contentrating", False) == "Mature":
+                # Try all possible locations for the preview image
+                img_path = os.path.join(subdir, preview_name)
+                found = os.path.isfile(img_path)
+                if not found:
+                    if os.path.isabs(preview_name) and os.path.isfile(preview_name):
+                        img_path = preview_name
+                        found = True
+                if not found:
+                    for root2, dirs2, files2 in os.walk(subdir):
+                        for file2 in files2:
+                            if file2 == preview_name:
+                                img_path = os.path.join(root2, file2)
+                                found = True
+                                break
+                        if found:
+                            break
+                if not found:
+                    continue
+
+                if (project_data.get("contentrating", False) == "Mature" or 
+                    project_data.get("contentrating", False) == "Questionable"):
                     config_data = {}
                     if os.path.isfile(USER_CONFIG_PATH):
                         try:
@@ -171,26 +194,38 @@ class CliFrontend(Gtk.Application):
                     if not config_data.get("MATURE_CONTENT", False):
                         continue
 
-                img_path = os.path.join(subdir, preview_name)
-                if not os.path.isfile(img_path):
-                    continue
-                # Load and scale image (preserve aspect ratio)
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(img_path)
-                width = pixbuf.get_width()
-                height = pixbuf.get_height()
-                scale_factor = target_width / width
-                new_height = max(1, int(height * scale_factor))
-                scaled_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(img_path, width=target_width, height=new_height, preserve_aspect_ratio=True)
-                image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
-                image.set_size_request(target_width, new_height)
+                # Only render the first frame if it's a GIF
+                if img_path.lower().endswith(".gif"):
+                    loader = GdkPixbuf.PixbufAnimation.new_from_file(img_path)
+                    pixbuf = loader.get_static_image()
+                    width = pixbuf.get_width()
+                    height = pixbuf.get_height()
+                    scale_factor = target_width / width
+                    new_height = max(1, int(height * scale_factor))
+                    scaled_pixbuf = pixbuf.scale_simple(target_width, new_height, GdkPixbuf.InterpType.BILINEAR)
+                    image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+                    image.set_size_request(target_width, new_height)
+                else:
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(img_path)
+                    width = pixbuf.get_width()
+                    height = pixbuf.get_height()
+                    scale_factor = target_width / width
+                    new_height = max(1, int(height * scale_factor))
+                    scaled_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(img_path, width=target_width, height=new_height, preserve_aspect_ratio=True)
+                    image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+                    image.set_size_request(target_width, new_height)
 
                 button = Gtk.Button()
                 button.set_child(image)
+                button.set_hexpand(False)
+                button.set_halign(Gtk.Align.FILL)
+                button.set_valign(Gtk.Align.CENTER)
+                button.set_size_request(-1, -1)
                 button.connect("clicked", self.on_image_button_clicked, img_path)
                 self.image_grid.append(button)
             except Exception:
                 continue
-
+        # ...existing code...
     def get_image_parent_folder(self, img_path):
         return os.path.basename(os.path.dirname(img_path))
 
