@@ -303,16 +303,28 @@ class CliFrontend(Gtk.Application):
             if not os.path.isfile(img_path):
                 self.selected_image_preview.clear()
                 return
-            # Load and scale image for preview (use width 200)
-            target_width = 200
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(img_path)
-            width = pixbuf.get_width()
-            height = pixbuf.get_height()
-            scale_factor = target_width / width
-            new_height = max(1, int(height * scale_factor))
-            scaled_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(img_path, width=target_width, height=new_height, preserve_aspect_ratio=True)
-            self.selected_image_preview.set_from_pixbuf(scaled_pixbuf)
-            self.selected_image_preview.set_size_request(target_width, new_height)
+            # Only render the first frame if it's a GIF
+            if img_path.lower().endswith(".gif"):
+                loader = GdkPixbuf.PixbufAnimation.new_from_file(img_path)
+                pixbuf = loader.get_static_image()
+                target_width = 200
+                width = pixbuf.get_width()
+                height = pixbuf.get_height()
+                scale_factor = target_width / width
+                new_height = max(1, int(height * scale_factor))
+                scaled_pixbuf = pixbuf.scale_simple(target_width, new_height, GdkPixbuf.InterpType.BILINEAR)
+                self.selected_image_preview.set_from_pixbuf(scaled_pixbuf)
+                self.selected_image_preview.set_size_request(target_width, new_height)
+            else:
+                target_width = 200
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file(img_path)
+                width = pixbuf.get_width()
+                height = pixbuf.get_height()
+                scale_factor = target_width / width
+                new_height = max(1, int(height * scale_factor))
+                scaled_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(img_path, width=target_width, height=new_height, preserve_aspect_ratio=True)
+                self.selected_image_preview.set_from_pixbuf(scaled_pixbuf)
+                self.selected_image_preview.set_size_request(target_width, new_height)
         except Exception:
             self.selected_image_preview.clear()
 
