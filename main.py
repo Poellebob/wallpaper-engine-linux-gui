@@ -488,7 +488,6 @@ def main():
         app.apply_walls(DummyButton())
         print("Applied wallpapers and exited.")
         sys.exit(0)
-        return
 
     # Check for --kill flag
     if "--kill" in sys.argv:
@@ -497,7 +496,6 @@ def main():
         app.kill_walls(DummyButton())
         print("Killed wallpapers and exited.")
         sys.exit(0)
-        return
 
     app = CliFrontend()
     app.run()
