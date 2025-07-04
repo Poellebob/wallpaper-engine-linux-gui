@@ -15,7 +15,7 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 
 ### Arch Linux
 
-Run the installer
+Run the installer (uses yay to install deps, edit the script to use paru if you use paru)
 
 ```sh
 ./install.sh
