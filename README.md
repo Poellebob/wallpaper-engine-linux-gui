@@ -13,10 +13,11 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 
 ## Installation
 
-### Arch Linux (yay required)
+### Arch Linux
+
+Run the installer
 
 ```sh
-yay -Sy --needed wallpaperengine-linux-git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
 ./install.sh
 ```
 
@@ -92,8 +93,8 @@ fps=25
 
 - `--apply` : Apply the selected wallpapers and exit (no GUI).
 - `--kill` : Kill all running wallpaperengine-linux processes and exit.
-- `--setup` : Create or update the .desktop file for the application and exit.
-- `--new-desktop` : Same as `--setup`.
+- `--setup` : Used by the install script.
+- `--new-desktop` : Create or update the .desktop file for the application and exit.
 - `--help` or `-h` : Show help message.
 
 Example:
