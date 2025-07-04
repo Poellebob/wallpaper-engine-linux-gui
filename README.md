@@ -46,7 +46,7 @@ sudo zypper install -y python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 g
 ./install.sh
 ```
 
-### Other Distributions / manuel
+### Other Distributions / Manuel
 
 Install the following dependencies manually:
 - python3
