@@ -9,10 +9,16 @@ import subprocess
 import signal
 import sys
 
+# Use XDG config directory for configs
+XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+CONFIG_DIR = os.path.join(XDG_CONFIG_HOME, "wallpaperengine-linux")
+os.makedirs(CONFIG_DIR, exist_ok=True)
+
+CONFIG_PATH = os.path.join(CONFIG_DIR, "config.ini")
+USER_CONFIG_PATH = os.path.join(CONFIG_DIR, "configuration.json")
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.ini")
 GLADE_PATH = os.path.join(SCRIPT_DIR, "ui.glade")
-USER_CONFIG_PATH = os.path.join(SCRIPT_DIR, "configuration.json")
 
 def get_walls_path():
     config = configparser.ConfigParser()
