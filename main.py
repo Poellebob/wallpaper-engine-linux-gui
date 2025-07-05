@@ -20,9 +20,6 @@ USER_CONFIG_PATH = os.path.join(CONFIG_DIR, "configuration.json")
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 GLADE_PATH = os.path.join(SCRIPT_DIR, "ui.glade")
 
-print(CONFIG_PATH)
-
-
 def get_walls_path():
     config = configparser.ConfigParser()
     config.read(CONFIG_PATH)
