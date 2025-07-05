@@ -2,6 +2,8 @@
 
 A GTK-based frontend for managing and applying wallpapers using [linux-wallpaperengine](https://github.com/Almamu/linux-wallpaperengine) on Linux.
 
+![Screenshot of Wallpaper Engine GTK Frontend](screenshot.png)
+
 ## Features
 
 - Browse and preview wallpapers from your Steam Workshop directory.
