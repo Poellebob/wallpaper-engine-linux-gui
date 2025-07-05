@@ -13,38 +13,7 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 
 ## Installation
 
-### Arch Linux
-
-Run the installer (uses yay to install deps, edit the script to use paru if you use paru)
-
-```sh
-./install.sh
-```
-
-### Debian/Ubuntu
-
-```sh
-sudo apt update
-sudo apt install -y python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection
-# Download and build wallpaperengine-linux manually: https://github.com/Almamu/linux-wallpaperengine
-./install.sh
-```
-
-### Fedora
-
-```sh
-sudo dnf install -y python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection
-# Download and build wallpaperengine-linux manually: https://github.com/Almamu/linux-wallpaperengine
-./install.sh
-```
-
-### openSUSE
-
-```sh
-sudo zypper install -y python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4
-# Download and build wallpaperengine-linux manually: https://github.com/Almamu/linux-wallpaperengine
-./install.sh
-```
+curl -fsSL https://raw.githubusercontent.com/Poellebob/wallpaper-engine-linux-gui/remote-install/install.sh | sh
 
 ### Other Distributions / Manuel
 
