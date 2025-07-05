@@ -12,8 +12,9 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 - CLI flags for automation (`--apply`, `--kill`, `--setup`).
 
 ## Installation
-
+```sh
 curl -fsSL https://raw.githubusercontent.com/Poellebob/wallpaper-engine-linux-gui/remote-install/install.sh | sh
+```
 
 ### Other Distributions / Manuel
 
