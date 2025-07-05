@@ -49,6 +49,7 @@ fps=25
 - `engine_path`: Path to the linux-wallpaperengine executable.
 - `fps`: Framerate limit for wallpapers.
 
+
 ## Usage
 
 1. Run the application:
@@ -73,6 +74,12 @@ Example:
 python3 main.py --apply
 python3 main.py --kill
 python3 main.py --new-desktop
+```
+
+### Hyprland (startup exaple)
+Apply walpapers without starting the gui
+```
+exec-once = pyton3 ~/.local/share/wallpaperengine-linux/main.py --apply 
 ```
 
 ## Desktop Integration
