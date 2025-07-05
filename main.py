@@ -10,7 +10,7 @@ import signal
 import sys
 
 # Use XDG config directory for configs
-XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+XDG_CONFIG_HOME = os.path.expanduser("~/.config")
 CONFIG_DIR = os.path.join(XDG_CONFIG_HOME, "wallpaperengine-linux")
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
@@ -20,12 +20,16 @@ USER_CONFIG_PATH = os.path.join(CONFIG_DIR, "configuration.json")
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 GLADE_PATH = os.path.join(SCRIPT_DIR, "ui.glade")
 
+print(CONFIG_PATH)
+
+
 def get_walls_path():
     config = configparser.ConfigParser()
     config.read(CONFIG_PATH)
     try:
         return config['config']['path']
     except Exception:
+        print("No workshop path set in config.ini")
         return None
 
 class CliFrontend(Gtk.Application):

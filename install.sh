@@ -66,7 +66,7 @@ esac
 mkdir -p ~/.config/wallpaperengine-linux
 # Create config.ini if it doesn't exist
 if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
-    echo "[Settings]" > ~/.config/wallpaperengine-linux/config.ini
+    echo "[config]" > ~/.config/wallpaperengine-linux/config.ini
     echo "path = ~/.steam/steam/steamapps/workshop/content/431960/" >> ~/.config/wallpaperengine-linux/config.ini
     echo "engine_path = /usr/bin/linux-wallpaperengine" >> ~/.config/wallpaperengine-linux/config.ini
     echo "fps=25" >> ~/.config/wallpaperengine-linux/config.ini
