@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository import Gtk, GdkPixbuf, Gdk, Gio
 import configparser
 import glob
 import os
@@ -9,10 +9,16 @@ import subprocess
 import signal
 import sys
 
+# Use XDG config directory for configs
+XDG_CONFIG_HOME = os.path.expanduser("~/.config")
+CONFIG_DIR = os.path.join(XDG_CONFIG_HOME, "wallpaperengine-linux")
+os.makedirs(CONFIG_DIR, exist_ok=True)
+
+CONFIG_PATH = os.path.join(CONFIG_DIR, "config.ini")
+USER_CONFIG_PATH = os.path.join(CONFIG_DIR, "configuration.json")
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.ini")
-GLADE_PATH = os.path.join(SCRIPT_DIR, "ui.glade")
-USER_CONFIG_PATH = os.path.join(SCRIPT_DIR, "configuration.json")
+UI_PATH = os.path.join(SCRIPT_DIR, "main.ui")
 
 def get_walls_path():
     config = configparser.ConfigParser()
@@ -20,6 +26,7 @@ def get_walls_path():
     try:
         return config['config']['path']
     except Exception:
+        print("No workshop path set in config.ini")
         return None
 
 class CliFrontend(Gtk.Application):
@@ -28,9 +35,11 @@ class CliFrontend(Gtk.Application):
         self.connect("activate", self.on_activate)
 
     def on_activate(self, app):
-        self.builder = Gtk.Builder()
-        self.builder.add_from_file(GLADE_PATH)
-        self.window = self.builder.get_object("main")
+        # Load UI from Cambalache .ui file
+        builder = Gtk.Builder()
+        builder.add_from_file(UI_PATH)
+        self.builder = builder
+        self.window = builder.get_object("main")
         self.window.set_application(app)
         self.window.connect("close-request", self.on_close_request)
 

@@ -63,7 +63,33 @@ case "$OS_ID" in
         ;;
 esac
 
-echo "This will make a .desktop file for the wallpaper engine linux."
-echo "If you move the wallpaper engine linux folder, you will have to run this script again to update the .desktop file."
+mkdir -p ~/.config/wallpaperengine-linux
+# Create config.ini if it doesn't exist
+if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
+    echo "[config]" > ~/.config/wallpaperengine-linux/config.ini
+    echo "path = ~/.steam/steam/steamapps/workshop/content/431960/" >> ~/.config/wallpaperengine-linux/config.ini
+    echo "engine_path = /usr/bin/linux-wallpaperengine" >> ~/.config/wallpaperengine-linux/config.ini
+    echo "fps=25" >> ~/.config/wallpaperengine-linux/config.ini
+fi
+
+git clone --branch remote-install git@github.com:Poellebob/wallpaper-engine-linux-gui.git
+cd wallpaper-engine-linux-gui
+
+mkdir -p ~/.local/share/wallpaperengine-linux
+cp main.py ~/.local/share/wallpaperengine-linux/
+cp icon.png ~/.local/share/wallpaperengine-linux/
+cp ui.glade ~/.local/share/wallpaperengine-linux/
+
+echo "This will now make a .desktop file for the wallpaper engine linux."
+
+if [ -f ~/.local/share/wallpaperengine-linux/main.py ]; then
+    python3 ~/.local/share/wallpaperengine-linux/main.py --new-desktop
+fi
+
 echo "You can now run the wallpaper engine linux from the applications menu."
-python3 main.py --new-desktop
+
+cd ..
+# Clean up the cloned repository
+rm -rf wallpaper-engine-linux-gui
+echo "Installation complete. You can now run Wallpaper Engine Linux from your applications menu."
+exit 0
