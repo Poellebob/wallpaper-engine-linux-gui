@@ -9,9 +9,7 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 - Browse and preview wallpapers from your Steam Workshop directory.
 - Assign different wallpapers to different screens.
 - Set framerate and engine path via configuration.
-- GTK4-based UI with image grid and per-screen preview.
-- One-click apply wallpapers to all screens.
-- CLI flags for automation (`--apply`, `--kill`, `--setup`).
+- CLI flags for automation (`--apply`, `--kill`, `--new-desktop`).
 
 ## Installation (arch (works best), debian based, fedora and suse)
 ```sh
