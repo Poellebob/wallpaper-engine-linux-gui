@@ -10,32 +10,91 @@ else
     OS_ID=$(uname -s)
 fi
 
+engine_path=/usr/bin/linux-wallpaperengine
+
+build_linux_wallpaperengine() {
+    echo "Buildlding linux-wallpaperengine from https://github.com/Almamu/linux-wallpaperengine"
+    git clone --recurse-submodules https://github.com/Almamu/linux-wallpaperengine.git
+    cd linux-wallpaperengine
+    mkdir build && cd build
+    cmake ..
+    make
+
+    if [ $? -ne 0 ]; then
+        echo "Build failed. Please check the output above for errors."
+        exit 1
+    else
+        echo "Build completed successfully."
+    fi
+
+    mv -r ./outout/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
+    $engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
+    cd ../..
+}
+
 install_arch() {
     echo "Detected Arch Linux."
     echo "Installing linux-wallpaperengine-git and dependencies with yay..."
     yay -Sy --needed linux-wallpaperengine-git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
+    engine_path=$(which linux-wallpaperengine)
 }
 
 install_debian() {
     echo "Detected Debian/Ubuntu."
     echo "Installing dependencies with apt..."
     sudo apt update
-    sudo apt install -y python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection
-    echo "You must install linux-wallpaperengine manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
+    sudo apt install -y \
+        python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection \
+        cmake build-essential \
+        liblz4-dev zlib1g-dev \
+        libsdl2-dev \
+        ffmpeg \
+        libx11-dev libwayland-dev \
+        libxrandr-dev \
+        libglfw3-dev libglew-dev freeglut3-dev libglm-dev \
+        mpv \
+        libpulse-dev \
+        libfftw3-dev \
+        libgl1-mesa-dev
+    build_linux_wallpaperengine
 }
 
 install_fedora() {
     echo "Detected Fedora."
     echo "Installing dependencies with dnf..."
-    sudo dnf install -y python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection
-    echo "You must install linux-wallpaperengine manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
+    sudo dnf install -y \
+        python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection \
+        cmake gcc-c++ make \
+        lz4-devel zlib-devel \
+        SDL2-devel \
+        ffmpeg \
+        libX11-devel wayland-devel \
+        libXrandr-devel \
+        glfw-devel glew-devel freeglut-devel glm-devel \
+        mpv \
+        pulseaudio-libs-devel \
+        fftw-devel \
+        mesa-libGL-devel
+    build_linux_wallpaperengine
 }
 
 install_suse() {
     echo "Detected openSUSE."
     echo "Installing dependencies with zypper..."
-    sudo zypper install -y python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4
-    echo "You must install linux-wallpaperengine manually (see https://github.com/Almamu/linux-wallpaperengine), build or install it and then set engine_path=<path to bin> in config.ini."
+    sudo zypper install -y \
+        python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4 \
+        cmake gcc-c++ make \
+        liblz4-devel zlib-devel \
+        libSDL2-devel \
+        ffmpeg \
+        libX11-devel libwayland-devel \
+        libXrandr-devel \
+        glfw3-devel glew-devel freeglut-devel glm-devel \
+        mpv \
+        libpulse-devel \
+        fftw3-devel \
+        Mesa-libGL-devel
+    build_linux_wallpaperengine
 }
 
 case "$OS_ID" in
@@ -68,7 +127,7 @@ mkdir -p ~/.config/wallpaperengine-linux
 if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
     echo "[config]" > ~/.config/wallpaperengine-linux/config.ini
     echo "path = ~/.steam/steam/steamapps/workshop/content/431960/" >> ~/.config/wallpaperengine-linux/config.ini
-    echo "engine_path = /usr/bin/linux-wallpaperengine" >> ~/.config/wallpaperengine-linux/config.ini
+    echo "engine_path = $engine_path" >> ~/.config/wallpaperengine-linux/config.ini
     echo "fps=25" >> ~/.config/wallpaperengine-linux/config.ini
 fi
 
