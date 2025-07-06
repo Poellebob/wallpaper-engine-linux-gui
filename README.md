@@ -63,7 +63,7 @@ fps=25
 ### CLI Flags
 
 - `--apply` : Apply the selected wallpapers and exit (no GUI).
-- `--kill` : Kill all running wallpaperengine-linux processes and exit.
+- `--kill` : Kill all running linux-wallpaperengine processes and exit.
 - `--new-desktop` : Create or update the .desktop file for the application and exit.
 - `--help` or `-h` : Show help message.
 
