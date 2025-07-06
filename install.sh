@@ -27,8 +27,8 @@ build_linux_wallpaperengine() {
         echo "Build completed successfully."
     fi
 
-    mv -r ./outout/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
-    $engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
+    cp -r ./outout/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
+    engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
     cd ../..
 }
 
