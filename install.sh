@@ -121,7 +121,7 @@ if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
     echo "fps=25" >> ~/.config/wallpaperengine-linux/config.ini
 fi
 
-git clone --branch remote-install git@github.com:Poellebob/wallpaper-engine-linux-gui.git
+git clone --branch remote-install https://github.com/Poellebob/wallpaper-engine-linux-gui.git
 cd wallpaper-engine-linux-gui
 
 mkdir -p ~/.local/share/wallpaperengine-linux
