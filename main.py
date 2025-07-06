@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository import Gtk, GdkPixbuf, Gdk, Gio
 import configparser
 import glob
 import os
@@ -18,7 +18,7 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, "config.ini")
 USER_CONFIG_PATH = os.path.join(CONFIG_DIR, "configuration.json")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-GLADE_PATH = os.path.join(SCRIPT_DIR, "ui.glade")
+UI_PATH = os.path.join(SCRIPT_DIR, "main.ui")
 
 def get_walls_path():
     config = configparser.ConfigParser()
@@ -35,9 +35,11 @@ class CliFrontend(Gtk.Application):
         self.connect("activate", self.on_activate)
 
     def on_activate(self, app):
-        self.builder = Gtk.Builder()
-        self.builder.add_from_file(GLADE_PATH)
-        self.window = self.builder.get_object("main")
+        # Load UI from Cambalache .ui file
+        builder = Gtk.Builder()
+        builder.add_from_file(UI_PATH)
+        self.builder = builder
+        self.window = builder.get_object("main")
         self.window.set_application(app)
         self.window.connect("close-request", self.on_close_request)
 
