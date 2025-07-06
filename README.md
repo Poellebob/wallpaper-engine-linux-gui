@@ -22,8 +22,8 @@ Install the following dependencies manually:
 - python3
 - python3-gi
 - python3-gobject
-- GTK+ 4 (libgtk-4-1 or gtk4)
-- GdkPixbuf (gir1.2-gdkpixbuf-2.0 or gdk-pixbuf2)
+- GTK4
+- GdkPixbuf
 - wallpaperengine-linux (https://github.com/Almamu/linux-wallpaperengine)
 
 Then run:
