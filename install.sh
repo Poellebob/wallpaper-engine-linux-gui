@@ -35,7 +35,7 @@ build_linux_wallpaperengine() {
 install_arch() {
     echo "Detected Arch Linux."
     echo "Installing linux-wallpaperengine-git and dependencies with yay..."
-    yay -Sy --needed linux-wallpaperengine-git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
+    yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
     engine_path=$(which linux-wallpaperengine)
 }
 
