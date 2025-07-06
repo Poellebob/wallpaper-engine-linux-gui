@@ -58,9 +58,9 @@ install_fedora() {
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         mesa-libGL-devel glew-devel freeglut-devel \
         SDL2-devel lz4-devel \
-        ffmpeg-libs ffmpeg-devel \
+        ffmpeg-free \
         libXxf86vm-devel glm-devel glfw-devel \
-        mpv mpv-libs libmpv-devel \
+        mpv mpv-libs \
         pulseaudio-libs-devel fftw-devel
 
     build_linux_wallpaperengine
