@@ -53,7 +53,7 @@ install_fedora() {
     echo "Detected Fedora."
     echo "Installing dependencies with dnf..."
     sudo dnf install -y \
-        git python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection \
+        git python3-gobject gtk4 gobject-introspection \
         gcc-c++ make cmake \
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         mesa-libGL-devel glew-devel freeglut-devel \
