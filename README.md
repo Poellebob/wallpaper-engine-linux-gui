@@ -28,7 +28,7 @@ Install the following dependencies manually:
 
 Then run:
 ```sh
-python3 main.py --setup
+python3 main.py --new-desktop
 ```
 
 ## Configuration
