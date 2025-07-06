@@ -44,7 +44,7 @@ install_debian() {
     echo "Installing dependencies with apt..."
     sudo apt update
     sudo apt-get install -y \
-        python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection \
+        git python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection \
         build-essential cmake libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev libglew-dev freeglut3-dev libsdl2-dev liblz4-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxxf86vm-dev libglm-dev libglfw3-dev libmpv-dev mpv libmpv2 libpulse-dev libpulse0 libfftw3-dev
     build_linux_wallpaperengine
 }
@@ -53,7 +53,7 @@ install_fedora() {
     echo "Detected Fedora."
     echo "Installing dependencies with dnf..."
     sudo dnf install -y \
-        python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection \
+        git python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection \
         gcc-c++ make cmake \
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         mesa-libGL-devel glew-devel freeglut-devel \
@@ -70,7 +70,7 @@ install_suse() {
     echo "Detected openSUSE."
     echo "Installing dependencies with zypper..."
     sudo zypper install -y \
-        python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4 \
+        git python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4 \
         gcc-c++ make cmake \
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         Mesa-libGL-devel glew-devel freeglut-devel \
