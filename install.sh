@@ -54,17 +54,15 @@ install_fedora() {
     echo "Installing dependencies with dnf..."
     sudo dnf install -y \
         python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection \
-        cmake gcc-c++ make \
-        lz4-devel zlib-devel \
-        SDL2-devel \
-        ffmpeg \
-        libX11-devel wayland-devel \
-        libXrandr-devel \
-        glfw-devel glew-devel freeglut-devel glm-devel \
-        mpv \
-        pulseaudio-libs-devel \
-        fftw-devel \
-        mesa-libGL-devel
+        gcc-c++ make cmake \
+        libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
+        mesa-libGL-devel glew-devel freeglut-devel \
+        SDL2-devel lz4-devel \
+        ffmpeg-libs ffmpeg-devel \
+        libXxf86vm-devel glm-devel glfw-devel \
+        mpv mpv-libs libmpv-devel \
+        pulseaudio-libs-devel fftw-devel
+
     build_linux_wallpaperengine
 }
 
@@ -73,17 +71,15 @@ install_suse() {
     echo "Installing dependencies with zypper..."
     sudo zypper install -y \
         python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4 \
-        cmake gcc-c++ make \
-        liblz4-devel zlib-devel \
-        libSDL2-devel \
-        ffmpeg \
-        libX11-devel libwayland-devel \
-        libXrandr-devel \
-        glfw3-devel glew-devel freeglut-devel glm-devel \
-        mpv \
-        libpulse-devel \
-        fftw3-devel \
-        Mesa-libGL-devel
+        gcc-c++ make cmake \
+        libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
+        Mesa-libGL-devel glew-devel freeglut-devel \
+        libSDL2-devel liblz4-devel \
+        libavcodec-devel libavformat-devel libavutil-devel libswscale-devel \
+        libXxf86vm-devel glm-devel glfw3-devel \
+        mpv libmpv-devel \
+        libpulse-devel fftw3-devel
+
     build_linux_wallpaperengine
 }
 
