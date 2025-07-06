@@ -78,7 +78,8 @@ cd wallpaper-engine-linux-gui
 mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
 cp icon.png ~/.local/share/wallpaperengine-linux/
-cp ui.glade ~/.local/share/wallpaperengine-linux/
+cp main.ui ~/.local/share/wallpaperengine-linux/
+cp main.ui.cmb ~/.local/share/wallpaperengine-linux/
 
 echo "This will now make a .desktop file for the wallpaper engine linux."
 
