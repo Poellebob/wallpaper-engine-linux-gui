@@ -473,7 +473,7 @@ def main():
                 f.write("Type=Application\n")
                 f.write("Name=Wallpaper Engine Linux\n")
                 f.write(f"Exec=python3 '{os.path.abspath(__file__)}'\n")
-                f.write(f"Icon={os.path.dirname(__file__) + "/icon.png"}\n")
+                f.write(f"Icon={os.path.dirname(__file__)}/icon.png\n")
                 f.write("Categories=Utility;\n")
                 print(f"Created .desktop file at {desktop_file}")
             os.chmod(desktop_file, 0o755)
