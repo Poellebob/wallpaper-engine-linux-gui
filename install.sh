@@ -45,17 +45,7 @@ install_debian() {
     sudo apt update
     sudo apt install -y \
         python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection \
-        cmake build-essential \
-        liblz4-dev zlib1g-dev \
-        libsdl2-dev \
-        ffmpeg \
-        libx11-dev libwayland-dev \
-        libxrandr-dev \
-        libglfw3-dev libglew-dev freeglut3-dev libglm-dev \
-        mpv \
-        libpulse-dev \
-        libfftw3-dev \
-        libgl1-mesa-dev
+        sudo apt-get install build-essential cmake libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev libglew-dev freeglut3-dev libsdl2-dev liblz4-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxxf86vm-dev libglm-dev libglfw3-dev libmpv-dev mpv libmpv2 libpulse-dev libpulse0 libfftw3-dev
     build_linux_wallpaperengine
 }
 
