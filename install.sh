@@ -75,10 +75,10 @@ install_suse() {
         gcc-c++ make cmake \
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         Mesa-libGL-devel glew-devel freeglut-devel \
-        libSDL2-devel liblz4-devel \
+        liblz4-devel \
         libavcodec-devel libavformat-devel libavutil-devel libswscale-devel \
-        libXxf86vm-devel glm-devel glfw3-devel \
-        mpv libmpv-devel \
+        libXxf86vm-devel glm-devel \
+        mpv \
         libpulse-devel fftw3-devel
 
     build_linux_wallpaperengine
