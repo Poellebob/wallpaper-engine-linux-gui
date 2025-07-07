@@ -70,12 +70,16 @@ install_fedora() {
 install_suse() {
     echo "Detected openSUSE."
     echo "Installing dependencies with zypper..."
+
+    sudo zypper addrepo https://download.opensuse.org/repositories/games/openSUSE_Tumbleweed/games.repo
+    sudo zypper refresh
+    
     sudo zypper install -y \
         git python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4 \
         gcc-c++ make cmake \
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         Mesa-libGL-devel glew-devel freeglut-devel \
-        liblz4-devel \
+        liblz4-devel libSDL2-devel\
         libavcodec-devel libavformat-devel libavutil-devel libswscale-devel \
         libXxf86vm-devel glm-devel \
         mpv \
