@@ -61,7 +61,8 @@ install_fedora() {
         ffmpeg-free \
         libXxf86vm-devel glm-devel glfw-devel \
         mpv mpv-libs \
-        pulseaudio-libs-devel fftw-devel
+        pulseaudio-libs-devel fftw-devel \
+        spirv-tools
 
     build_linux_wallpaperengine
 }
