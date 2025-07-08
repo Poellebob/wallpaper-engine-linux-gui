@@ -35,7 +35,7 @@ build_linux_wallpaperengine() {
 install_arch() {
     echo "Detected Arch Linux."
     echo "Installing linux-wallpaperengine-git and dependencies with yay..."
-    yay -Sy --needed linux-wallpaperengine-git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
+    yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
     engine_path=$(which linux-wallpaperengine)
 }
 
@@ -44,7 +44,7 @@ install_debian() {
     echo "Installing dependencies with apt..."
     sudo apt update
     sudo apt-get install -y \
-        python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection \
+        git python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection \
         build-essential cmake libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev libglew-dev freeglut3-dev libsdl2-dev liblz4-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxxf86vm-dev libglm-dev libglfw3-dev libmpv-dev mpv libmpv2 libpulse-dev libpulse0 libfftw3-dev
     build_linux_wallpaperengine
 }
@@ -53,31 +53,50 @@ install_fedora() {
     echo "Detected Fedora."
     echo "Installing dependencies with dnf..."
     sudo dnf install -y \
-        python3-gobject gtk4 gtk4-gdk-pixbuf2 gobject-introspection \
+        git python3-gobject gtk4 gobject-introspection \
         gcc-c++ make cmake \
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         mesa-libGL-devel glew-devel freeglut-devel \
         SDL2-devel lz4-devel \
-        ffmpeg-libs ffmpeg-devel \
+        ffmpeg-free \
         libXxf86vm-devel glm-devel glfw-devel \
-        mpv mpv-libs libmpv-devel \
-        pulseaudio-libs-devel fftw-devel
+        mpv mpv-libs \
+        pulseaudio-libs-devel fftw-devel \
+        spirv-tools
 
     build_linux_wallpaperengine
 }
 
 install_suse() {
+    echo "suse is not fully supported and the packages might be wrong."
+    echo "If you know how suse works, consider opening a bug report or submitting a pull request. Thanks :)"
+    read -p "Do you want to continue? [y/N]: " choice
+
+    case "$choice" in
+      [yY]|[yY][eE][sS])
+        echo "Continuing..."
+        ;;
+      *)
+        echo "Aborted."
+        exit 1
+        ;;
+    esac
+
     echo "Detected openSUSE."
     echo "Installing dependencies with zypper..."
+
+    sudo zypper addrepo https://download.opensuse.org/repositories/games/openSUSE_Tumbleweed/games.repo
+    sudo zypper refresh
+
     sudo zypper install -y \
-        python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4 \
+        git python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-4_0 gtk4 \
         gcc-c++ make cmake \
         libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel \
         Mesa-libGL-devel glew-devel freeglut-devel \
-        libSDL2-devel liblz4-devel \
+        liblz4-devel libSDL3_image0 \
         libavcodec-devel libavformat-devel libavutil-devel libswscale-devel \
-        libXxf86vm-devel glm-devel glfw3-devel \
-        mpv libmpv-devel \
+        libXxf86vm-devel glm-devel \
+        mpv \
         libpulse-devel fftw3-devel
 
     build_linux_wallpaperengine

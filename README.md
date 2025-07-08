@@ -22,13 +22,13 @@ Install the following dependencies manually:
 - python3
 - python3-gi
 - python3-gobject
-- GTK+ 4 (libgtk-4-1 or gtk4)
-- GdkPixbuf (gir1.2-gdkpixbuf-2.0 or gdk-pixbuf2)
+- GTK4
+- GdkPixbuf
 - wallpaperengine-linux (https://github.com/Almamu/linux-wallpaperengine)
 
 Then run:
 ```sh
-python3 main.py --setup
+python3 main.py --new-desktop
 ```
 
 ## Configuration
@@ -63,7 +63,7 @@ fps=25
 ### CLI Flags
 
 - `--apply` : Apply the selected wallpapers and exit (no GUI).
-- `--kill` : Kill all running wallpaperengine-linux processes and exit.
+- `--kill` : Kill all running linux-wallpaperengine processes and exit.
 - `--new-desktop` : Create or update the .desktop file for the application and exit.
 - `--help` or `-h` : Show help message.
 
