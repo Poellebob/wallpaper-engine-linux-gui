@@ -13,14 +13,18 @@ fi
 engine_path=/usr/bin/linux-wallpaperengine
 
 build_linux_wallpaperengine() {
-    if [ -d linux-wallpaperengine ]; then
+    if [ ! -f install.sh ]; then
+        git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+        cd wallpaper-engine-linux-gui
+    fi
+    if [ -d linux-wallpaperengine/ ]; then
         echo "Repository already exists. Pulling latest changes..."
         cd linux-wallpaperengine
         git pull --recurse-submodules
         git submodule update --init --recursive
     else
         echo "Cloning linux-wallpaperengine repository..."
-        git clone --recurse-submodules https://github.com/Almamu/linux-wallpaperengine.git
+        git clone https://github.com/Almamu/linux-wallpaperengine.git
         cd linux-wallpaperengine
     fi
 
@@ -135,6 +139,10 @@ case "$OS_ID" insrc/External/glslang-WallpaperEngine
         echo "  - wallpaperengine-linux (https://github.com/Almamu/linux-wallpaperengine)"
         ;;
 esac
+
+if [ ! -f main.py ]; then
+    echo "main.py already exists, skipping copy."
+fi
 
 mkdir -p ~/.config/wallpaperengine-linux
 # Create config.ini if it doesn't exist
