@@ -102,7 +102,7 @@ install_suse() {
     build_linux_wallpaperengine
 }
 
-case "$OS_ID" in
+case "$OS_ID" insrc/External/glslang-WallpaperEngine
     arch|manjaro|endeavouros)
         install_arch
         ;;
