@@ -127,6 +127,7 @@ case "$OS_ID" in
 esac
 
 mkdir -p ~/.config/wallpaperengine-linux
+mkdir -p ~/.config/wallpaperengine-linuxlinux-wallpaperengine
 # Create config.ini if it doesn't exist
 if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
     echo "[config]" > ~/.config/wallpaperengine-linux/config.ini
