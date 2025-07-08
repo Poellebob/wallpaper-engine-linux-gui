@@ -2,6 +2,8 @@
 
 echo "This will set up Wallpaper Engine Linux and its dependencies."
 
+git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+
 # Detect OS
 if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -13,22 +15,8 @@ fi
 engine_path=/usr/bin/linux-wallpaperengine
 
 build_linux_wallpaperengine() {
-    if [ ! -f install.sh ]; then
-        git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
-        cd wallpaper-engine-linux-gui
-    fi
-    if [ -d linux-wallpaperengine/ ]; then
-        echo "Repository already exists. Pulling latest changes..."
-        cd linux-wallpaperengine
-        git pull --recurse-submodules
-        git submodule update --init --recursive
-    else
-        echo "Cloning linux-wallpaperengine repository..."
-        git clone https://github.com/Almamu/linux-wallpaperengine.git
-        cd linux-wallpaperengine
-    fi
-
-    mkdir -p build && cd build
+    cd linux-wallpaperengine
+    mkdir build && cd build
     cmake ..
     make
 
@@ -39,7 +27,7 @@ build_linux_wallpaperengine() {
         echo "Build completed successfully."
     fi
 
-    cp -r ./output/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
+    cp -r ./outout/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
     engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
     cd ../..
 }
@@ -58,7 +46,6 @@ install_debian() {
     sudo apt-get install -y \
         git python3 python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-gdkpixbuf-2.0 gobject-introspection \
         build-essential cmake libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev libglew-dev freeglut3-dev libsdl2-dev liblz4-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxxf86vm-dev libglm-dev libglfw3-dev libmpv-dev mpv libmpv2 libpulse-dev libpulse0 libfftw3-dev
-    
     build_linux_wallpaperengine
 }
 
@@ -140,10 +127,6 @@ case "$OS_ID" insrc/External/glslang-WallpaperEngine
         ;;
 esac
 
-if [ ! -f main.py ]; then
-    echo "main.py already exists, skipping copy."
-fi
-
 mkdir -p ~/.config/wallpaperengine-linux
 # Create config.ini if it doesn't exist
 if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
@@ -152,6 +135,8 @@ if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
     echo "engine_path = $engine_path" >> ~/.config/wallpaperengine-linux/config.ini
     echo "fps=25" >> ~/.config/wallpaperengine-linux/config.ini
 fi
+
+cd wallpaper-engine-linux-gui
 
 mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
