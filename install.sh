@@ -2,8 +2,6 @@
 
 echo "This will set up Wallpaper Engine Linux and its dependencies."
 
-git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
-
 # Detect OS
 if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -15,7 +13,8 @@ fi
 engine_path=/usr/bin/linux-wallpaperengine
 
 build_linux_wallpaperengine() {
-    cd linux-wallpaperengine
+    git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+    cd wallpaper-engine-linux-gui/linux-wallpaperengine
     mkdir build && cd build
     cmake ..
     make
