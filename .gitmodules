@@ -1,0 +1,4 @@
+[submodule "src/External/glslang-WallpaperEngine"]
+	path = linux-wallpaperengine
+	url = https://github.com/Almamu/linux-wallpaperengine.git
+	branch = main
