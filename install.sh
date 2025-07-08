@@ -128,12 +128,15 @@ esac
 
 mkdir -p ~/.config/wallpaperengine-linux
 mkdir -p ~/.config/wallpaperengine-linuxlinux-wallpaperengine
-# Create config.ini if it doesn't exist
-if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
-    echo "[config]" > ~/.config/wallpaperengine-linux/config.ini
-    echo "path = ~/.steam/steam/steamapps/workshop/content/431960/" >> ~/.config/wallpaperengine-linux/config.ini
-    echo "engine_path = $engine_path" >> ~/.config/wallpaperengine-linux/config.ini
-    echo "fps=25" >> ~/.config/wallpaperengine-linux/config.ini
+
+if [ ! -f ~/.config/wallpaperengine-linux/config.json ]; then
+    cat > ~/.config/wallpaperengine-linux/config.json << EOF 
+    {
+        "path": "~/.steam/steam/steamapps/workshop/content/431960/",
+        "engine_path": "$engine_path",
+        "fps": 25
+    }
+EOF
 fi
 
 mkdir -p ~/.local/share/wallpaperengine-linux

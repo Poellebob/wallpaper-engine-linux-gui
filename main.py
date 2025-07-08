@@ -14,20 +14,65 @@ XDG_CONFIG_HOME = os.path.expanduser("~/.config")
 CONFIG_DIR = os.path.join(XDG_CONFIG_HOME, "wallpaperengine-linux")
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
-CONFIG_PATH = os.path.join(CONFIG_DIR, "config.ini")
-USER_CONFIG_PATH = os.path.join(CONFIG_DIR, "configuration.json")
+CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 UI_PATH = os.path.join(SCRIPT_DIR, "main.ui")
 
-def get_walls_path():
-    config = configparser.ConfigParser()
-    config.read(CONFIG_PATH)
+def migrate():
+    config_data = {}
+
+    # Migrate from config.ini
+    ini_path = os.path.join(CONFIG_DIR, "config.ini")
+    if os.path.isfile(ini_path):
+        try:
+            config = configparser.ConfigParser()
+            config.read(ini_path)
+            if "config" in config:
+                config_data.update(config["config"])
+            os.remove(ini_path)
+        except Exception as e:
+            print(f"Failed to migrate config.ini: {e}")
+
+    # Migrate from configuration.json
+    json_path = os.path.join(CONFIG_DIR, "configuration.json")
+    if os.path.isfile(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+                for key, value in old_data.items():
+                    config_data[key] = {"ID": value} if isinstance(value, str) else value
+            os.remove(json_path)
+        except Exception as e:
+            print(f"Failed to migrate configuration.json: {e}")
+
+    # Write to config.json
     try:
-        return config['config']['path']
-    except Exception:
-        print("No workshop path set in config.ini")
-        return None
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(config_data, f, indent=2)
+    except Exception as e:
+        print(f"Failed to write config.json: {e}")
+
+def get_config():
+    config_data = {}
+    if os.path.isfile(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+        except Exception as e:
+            print(f"Failed to read config.json: {e}")
+    return config_data
+
+def save_config(config_data):
+    try:
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(config_data, f, indent=2)
+    except Exception as e:
+        print(f"Failed to write config.json: {e}")
+
+def get_walls_path():
+    config_data = get_config()
+    return config_data.get("path", None)
 
 class CliFrontend(Gtk.Application):
     def __init__(self):
@@ -48,13 +93,7 @@ class CliFrontend(Gtk.Application):
         if hasattr(paned, "set_position"):
             paned.set_position(220)  # Sidebar width (preview image + padding)
 
-        config_data = {}
-        if os.path.isfile(USER_CONFIG_PATH):
-            try:
-                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-            except Exception:
-                config_data = {}
+        config_data = get_config()  # Load configuration from config.json
 
         self.image_grid = self.builder.get_object("image_grid")
         self.populate_images()
@@ -105,6 +144,13 @@ class CliFrontend(Gtk.Application):
         else:
             self.mature_toggle.set_css_classes(["destructive-action"])
 
+        # Add a separator with padding top and bottom
+        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        separator.set_margin_top(6)
+        separator.set_margin_bottom(6)
+        sidebar_box.append(separator)
+        separator.show()
+
         self.populate_displays()
         self.display_selector.connect("changed", self.on_display_changed)
 
@@ -115,36 +161,23 @@ class CliFrontend(Gtk.Application):
         self.quit()
 
     def toggle_mature_content(self, button):
-        config_data = {}
-        if os.path.isfile(USER_CONFIG_PATH):
-            try:
-                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-            except Exception:
-                config_data = {}
-        
-        if "MATURE_CONTENT" in config_data:
-            config_data["MATURE_CONTENT"] = not config_data["MATURE_CONTENT"]
-        else:
-            config_data["MATURE_CONTENT"] = True
-        
-        with open(USER_CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(config_data, f, indent=2)
+        config_data = get_config()
+        config_data["MATURE_CONTENT"] = not config_data.get("MATURE_CONTENT", False)
+        save_config(config_data)
 
         # Update toggle button color
-        if config_data.get("MATURE_CONTENT", False):
+        if config_data["MATURE_CONTENT"]:
             self.mature_toggle.set_css_classes(["suggested-action"])
         else:
             self.mature_toggle.set_css_classes(["destructive-action"])
 
-        
         # Refresh images based on new mature content setting
         child = self.image_grid.get_first_child()
         while child:
             next_child = child.get_next_sibling()
             self.image_grid.remove(child)
             child = next_child
-        self.populate_images()    
+        self.populate_images()
 
     def populate_images(self):
         # Get UI scale (fallback to 1 if not set)
@@ -191,19 +224,13 @@ class CliFrontend(Gtk.Application):
                 if not found:
                     continue
 
-                if (project_data.get("contentrating", False) == "Mature" or 
-                    project_data.get("contentrating", False) == "Questionable"):
-                    config_data = {}
-                    if os.path.isfile(USER_CONFIG_PATH):
-                        try:
-                            with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-                                config_data = json.load(f)
-                        except Exception:
-                            config_data = {}
+                # Filter mature content based on config.json
+                if project_data.get("contentrating", False) in ["Mature", "Questionable"]:
+                    config_data = get_config()
                     if not config_data.get("MATURE_CONTENT", False):
                         continue
 
-                # Only render the first frame if it's a GIF
+                # Render the preview image
                 if img_path.lower().endswith(".gif"):
                     loader = GdkPixbuf.PixbufAnimation.new_from_file(img_path)
                     pixbuf = loader.get_static_image()
@@ -234,7 +261,6 @@ class CliFrontend(Gtk.Application):
                 self.image_grid.append(button)
             except Exception:
                 continue
-        # ...existing code...
     def get_image_parent_folder(self, img_path):
         return os.path.basename(os.path.dirname(img_path))
 
@@ -251,24 +277,26 @@ class CliFrontend(Gtk.Application):
             self.display_selector.set_active(0)
 
     def on_image_button_clicked(self, button, img_path):
-        parent_folder = self.get_image_parent_folder(img_path)
-        print(parent_folder)
+        # Get the parent folder of the image
+        parent_folder = os.path.basename(os.path.dirname(img_path))
+        print(f"Selected wallpaper: {parent_folder}")
+
         # Get selected screen id
         screen_id = self.display_selector.get_active()
         if screen_id < 0:
+            print("No screen selected.")
             return
-        # Load or create configuration.json
-        config_data = {}
-        if os.path.isfile(USER_CONFIG_PATH):
-            try:
-                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-            except Exception:
-                config_data = {}
-        # Store mapping
-        config_data[str(screen_id)] = parent_folder
-        with open(USER_CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(config_data, f, indent=2)
+
+        # Load configuration from config.json
+        config_data = get_config()
+
+        # Update the mapping for the selected screen
+        config_data[str(screen_id)] = {"ID": parent_folder}
+        save_config(config_data)  # Save the updated configuration
+
+        print(f"Updated config.json: Screen {screen_id} -> {parent_folder}")
+
+        # Update the preview for the selected screen
         self.update_selected_image_preview()
 
     def on_display_changed(self, combo):
@@ -279,28 +307,27 @@ class CliFrontend(Gtk.Application):
         if screen_id < 0:
             self.selected_image_preview.clear()
             return
-        # Load configuration.json
-        config_data = {}
-        if os.path.isfile(USER_CONFIG_PATH):
-            try:
-                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-            except Exception:
-                config_data = {}
-        parent_folder = config_data.get(str(screen_id))
+
+        # Load configuration from config.json
+        config_data = get_config()
+        screen_config = config_data.get(str(screen_id), {})
+        parent_folder = screen_config.get("ID")
         if not parent_folder:
             self.selected_image_preview.clear()
             return
+
         # Find the preview image for this parent folder
         workshop_base = get_walls_path()
         if not workshop_base:
             self.selected_image_preview.clear()
             return
+
         subdir = os.path.join(os.path.expanduser(workshop_base), parent_folder)
         project_json_path = os.path.join(subdir, "project.json")
         if not os.path.isfile(project_json_path):
             self.selected_image_preview.clear()
             return
+
         try:
             with open(project_json_path, "r", encoding="utf-8") as f:
                 project_data = json.load(f)
@@ -308,15 +335,17 @@ class CliFrontend(Gtk.Application):
             if not preview_name:
                 self.selected_image_preview.clear()
                 return
+
             img_path = os.path.join(subdir, preview_name)
             if not os.path.isfile(img_path):
                 self.selected_image_preview.clear()
                 return
-            # Only render the first frame if it's a GIF
+
+            # Render the preview image
+            target_width = 200
             if img_path.lower().endswith(".gif"):
                 loader = GdkPixbuf.PixbufAnimation.new_from_file(img_path)
                 pixbuf = loader.get_static_image()
-                target_width = 200
                 width = pixbuf.get_width()
                 height = pixbuf.get_height()
                 scale_factor = target_width / width
@@ -325,7 +354,6 @@ class CliFrontend(Gtk.Application):
                 self.selected_image_preview.set_from_pixbuf(scaled_pixbuf)
                 self.selected_image_preview.set_size_request(target_width, new_height)
             else:
-                target_width = 200
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file(img_path)
                 width = pixbuf.get_width()
                 height = pixbuf.get_height()
@@ -338,6 +366,10 @@ class CliFrontend(Gtk.Application):
             self.selected_image_preview.clear()
 
     def apply_walls(self, button):
+        config_data = get_config()
+        engine_path = config_data.get("engine_path", None)
+        fps = config_data.get("fps", None)
+
         # Kill all running linux-wallpaperengine processes before starting new one
         try:
             import psutil
@@ -355,25 +387,9 @@ class CliFrontend(Gtk.Application):
             # Fallback if psutil is not installed
             os.system("pkill -9 linux-wallpaperengine")
 
-        # Get engine path and fps from config
-        config = configparser.ConfigParser()
-        config.read(CONFIG_PATH)
-        try:
-            engine_path = config['config']['engine_path']
-        except Exception:
-            print("Engine path not set in config.ini")
+        if not engine_path:
+            print("Engine path not set in config.json")
             return
-        fps = config['config'].get('fps', None)
-
-        # Load configuration.json
-        config_data = {}
-        if os.path.isfile(USER_CONFIG_PATH):
-            try:
-                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-            except Exception:
-                print("Could not read configuration.json")
-                return
 
         # Get screen names from Gdk
         display = Gdk.Display.get_default()
@@ -399,7 +415,8 @@ class CliFrontend(Gtk.Application):
             if not screen_id:
                 screen_id = f"Screen{i}"
 
-            bg_id = config_data.get(str(i), "")
+            screen_config = config_data.get(str(i), {})
+            bg_id = screen_config.get("ID", "")
             if bg_id:
                 print(f"Screen {i} ID: {screen_id}")
                 args += ["--screen-root", screen_id, "--bg", bg_id]
@@ -437,21 +454,13 @@ class CliFrontend(Gtk.Application):
             os.system("pkill -9 linux-wallpaperengine")
 
     def on_clear_wallpaper_clicked(self, button):
-        # Remove the wallpaper assignment for the selected screen
         screen_id = self.display_selector.get_active()
         if screen_id < 0:
             return
-        config_data = {}
-        if os.path.isfile(USER_CONFIG_PATH):
-            try:
-                with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-            except Exception:
-                config_data = {}
+        config_data = get_config()
         if str(screen_id) in config_data:
             del config_data[str(screen_id)]
-            with open(USER_CONFIG_PATH, "w", encoding="utf-8") as f:
-                json.dump(config_data, f, indent=2)
+            save_config(config_data)
         self.update_selected_image_preview()
 
 def main():
@@ -506,8 +515,11 @@ def main():
         print("Killed wallpapers and exited.")
         sys.exit(0)
 
+    
+
     app = CliFrontend()
     app.run()
 
 if __name__ == "__main__":
+    migrate()
     main()
