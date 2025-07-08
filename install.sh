@@ -26,7 +26,7 @@ build_linux_wallpaperengine() {
         echo "Build completed successfully."
     fi
 
-    cp -r ./outout/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
+    cp -r ./output/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
     engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
     cd ../..
 }
@@ -127,6 +127,7 @@ case "$OS_ID" in
 esac
 
 mkdir -p ~/.config/wallpaperengine-linux
+mkdir -p ~/.config/wallpaperengine-linuxlinux-wallpaperengine
 # Create config.ini if it doesn't exist
 if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
     echo "[config]" > ~/.config/wallpaperengine-linux/config.ini
@@ -134,8 +135,6 @@ if [ ! -f ~/.config/wallpaperengine-linux/config.ini ]; then
     echo "engine_path = $engine_path" >> ~/.config/wallpaperengine-linux/config.ini
     echo "fps=25" >> ~/.config/wallpaperengine-linux/config.ini
 fi
-
-cd wallpaper-engine-linux-gui
 
 mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
