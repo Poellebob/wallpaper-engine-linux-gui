@@ -29,7 +29,7 @@ def migrate():
             config.read(ini_path)
             if "config" in config:
                 config_data.update(config["config"])
-            #os.remove(ini_path)
+            os.remove(ini_path)
         except Exception as e:
             print(f"Failed to migrate config.ini: {e}")
 
@@ -41,7 +41,7 @@ def migrate():
                 old_data = json.load(f)
                 for key, value in old_data.items():
                     config_data[key] = {"ID": value} if isinstance(value, str) else value
-            #os.remove(json_path)
+            os.remove(json_path)
         except Exception as e:
             print(f"Failed to migrate configuration.json: {e}")
 
@@ -583,6 +583,6 @@ def main():
     app.run()
 
 if __name__ == "__main__":
-    if os.path.isfile(os.path.join(CONFIG_DIR, "config.ini")) or os.path.isfile(os.path.join(CONFIG_DIR, "configuration.json")):
+    if os.path.isfile(os.path.join(CONFIG_DIR, "config.ini")) and os.path.isfile(os.path.join(CONFIG_DIR, "configuration.json")):
         migrate()
     main()
