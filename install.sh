@@ -32,6 +32,8 @@ build_linux_wallpaperengine() {
 }
 
 install_arch() {
+    git clone https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+
     echo "Detected Arch Linux."
     echo "Installing linux-wallpaperengine-git and dependencies with yay..."
     yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
