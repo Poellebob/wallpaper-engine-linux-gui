@@ -471,6 +471,8 @@ class CliFrontend(Gtk.Application):
         # Create a new settings window
         settings_window = Gtk.Window(title="Settings")
         settings_window.set_default_size(400, 300)
+        settings_window.set_transient_for(self.window)
+        settings_window.set_modal(True)
 
         # Create a grid layout for settings
         grid = Gtk.Grid()
@@ -489,6 +491,7 @@ class CliFrontend(Gtk.Application):
         engine_label = Gtk.Label(label="Engine Path:")
         grid.attach(engine_label, 0, 0, 1, 1)
         engine_entry = Gtk.Entry()
+        engine_entry.set_hexpand(True)
         engine_entry.set_text(config_data.get("engine_path", ""))
         grid.attach(engine_entry, 1, 0, 1, 1)
 
@@ -496,6 +499,7 @@ class CliFrontend(Gtk.Application):
         fps_label = Gtk.Label(label="FPS:")
         grid.attach(fps_label, 0, 1, 1, 1)
         fps_entry = Gtk.Entry()
+        fps_entry.set_hexpand(True)
         fps_entry.set_text(str(config_data.get("fps", "")))
         grid.attach(fps_entry, 1, 1, 1, 1)
 
@@ -503,6 +507,7 @@ class CliFrontend(Gtk.Application):
         path_label = Gtk.Label(label="Workshop Path:")
         grid.attach(path_label, 0, 2, 1, 1)
         path_entry = Gtk.Entry()
+        path_entry.set_hexpand(True)
         path_entry.set_text(config_data.get("path", ""))
         grid.attach(path_entry, 1, 2, 1, 1)
 
