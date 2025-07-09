@@ -22,7 +22,6 @@ UI_PATH = os.path.join(SCRIPT_DIR, "main.ui")
 def migrate():
     config_data = {}
 
-    # Migrate from config.ini
     ini_path = os.path.join(CONFIG_DIR, "config.ini")
     if os.path.isfile(ini_path):
         try:
@@ -30,23 +29,22 @@ def migrate():
             config.read(ini_path)
             if "config" in config:
                 config_data.update(config["config"])
-            os.remove(ini_path)
+            #os.remove(ini_path)
         except Exception as e:
             print(f"Failed to migrate config.ini: {e}")
 
-    # Migrate from configuration.json
     json_path = os.path.join(CONFIG_DIR, "configuration.json")
+
     if os.path.isfile(json_path):
         try:
             with open(json_path, "r", encoding="utf-8") as f:
                 old_data = json.load(f)
                 for key, value in old_data.items():
                     config_data[key] = {"ID": value} if isinstance(value, str) else value
-            os.remove(json_path)
+            #os.remove(json_path)
         except Exception as e:
             print(f"Failed to migrate configuration.json: {e}")
 
-    # Write to config.json
     try:
         with open(CONFIG_PATH, "w", encoding="utf-8") as f:
             json.dump(config_data, f, indent=2)
@@ -93,7 +91,7 @@ class CliFrontend(Gtk.Application):
         if hasattr(paned, "set_position"):
             paned.set_position(220)  # Sidebar width (preview image + padding)
 
-        config_data = get_config()  # Load configuration from config.json
+        config_data = get_config()
 
         self.image_grid = self.builder.get_object("image_grid")
         self.populate_images()
@@ -150,6 +148,11 @@ class CliFrontend(Gtk.Application):
         separator.set_margin_bottom(6)
         sidebar_box.append(separator)
         separator.show()
+
+        self.settings_button = Gtk.Button(label="Settings")
+        sidebar_box.append(self.settings_button)
+        self.settings_button.connect("clicked", self.open_settings_widget)
+        self.settings_button.show()
 
         self.populate_displays()
         self.display_selector.connect("changed", self.on_display_changed)
@@ -261,6 +264,7 @@ class CliFrontend(Gtk.Application):
                 self.image_grid.append(button)
             except Exception:
                 continue
+    
     def get_image_parent_folder(self, img_path):
         return os.path.basename(os.path.dirname(img_path))
 
@@ -463,6 +467,64 @@ class CliFrontend(Gtk.Application):
             save_config(config_data)
         self.update_selected_image_preview()
 
+    def open_settings_widget(self, button):
+        # Create a new settings window
+        settings_window = Gtk.Window(title="Settings")
+        settings_window.set_default_size(400, 300)
+
+        # Create a grid layout for settings
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        grid.set_column_spacing(10)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+        settings_window.set_child(grid)
+
+        # Add input fields for settings
+        config_data = get_config()
+
+        # Engine Path
+        engine_label = Gtk.Label(label="Engine Path:")
+        grid.attach(engine_label, 0, 0, 1, 1)
+        engine_entry = Gtk.Entry()
+        engine_entry.set_text(config_data.get("engine_path", ""))
+        grid.attach(engine_entry, 1, 0, 1, 1)
+
+        # FPS
+        fps_label = Gtk.Label(label="FPS:")
+        grid.attach(fps_label, 0, 1, 1, 1)
+        fps_entry = Gtk.Entry()
+        fps_entry.set_text(str(config_data.get("fps", "")))
+        grid.attach(fps_entry, 1, 1, 1, 1)
+
+        # Workshop Path
+        path_label = Gtk.Label(label="Workshop Path:")
+        grid.attach(path_label, 0, 2, 1, 1)
+        path_entry = Gtk.Entry()
+        path_entry.set_text(config_data.get("path", ""))
+        grid.attach(path_entry, 1, 2, 1, 1)
+
+        # Save Button
+        save_button = Gtk.Button(label="Save")
+        grid.attach(save_button, 0, 3, 2, 1)
+        save_button.connect(
+            "clicked",
+            lambda btn: (
+                save_config({
+                    **get_config(),
+                    "engine_path": engine_entry.get_text(),
+                    "fps": int(fps_entry.get_text()) if fps_entry.get_text().isdigit() else None,
+                    "path": path_entry.get_text(),
+                }),
+                print("Settings saved."),
+                settings_window.close()
+            )
+        )
+
+        settings_window.present()
+
 def main():
     # Check for --apply flag
 
@@ -521,5 +583,6 @@ def main():
     app.run()
 
 if __name__ == "__main__":
-    migrate()
+    if os.path.isfile(os.path.join(CONFIG_DIR, "config.ini")) or os.path.isfile(os.path.join(CONFIG_DIR, "configuration.json")):
+        migrate()
     main()
