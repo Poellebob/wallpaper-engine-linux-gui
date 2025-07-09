@@ -85,7 +85,3 @@ exec-once = pyton3 ~/.local/share/wallpaperengine-linux/main.py --apply
 The install script (`install.sh`) will create a `.desktop` file in `~/.local/share/applications/wallpaperengine-linux.desktop` so you can launch the app from your applications menu.
 
 If you move the folder, re-run `install.sh` to update the .desktop file.
-
-## License
-
-MIT
