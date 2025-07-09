@@ -13,7 +13,7 @@ fi
 engine_path=/usr/bin/linux-wallpaperengine
 
 build_linux_wallpaperengine() {
-    git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+    git clone --branch devel --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
     cd wallpaper-engine-linux-gui/linux-wallpaperengine
     mkdir build && cd build
     cmake ..
@@ -32,7 +32,7 @@ build_linux_wallpaperengine() {
 }
 
 install_arch() {
-    git clone https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+    git clone --branch devel https://github.com/Poellebob/wallpaper-engine-linux-gui.git
     cd wallpaper-engine-linux-gui
 
     echo "Detected Arch Linux."
