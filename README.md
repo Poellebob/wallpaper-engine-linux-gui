@@ -11,11 +11,9 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 - Set framerate and engine path via configuration.
 - CLI flags for automation (`--apply`, `--kill`, `--new-desktop`).
 
-## Installation (arch (works best), debian based, fedora and suse)
-Be  aware that this is the development brach and most likely you will have a bad time.
-Go to master if you want the best experience https://github.com/Poellebob/wallpaper-engine-linux-gui/tree/master
+## Installation (arch, debian based, fedora and suse)
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Poellebob/wallpaper-engine-linux-gui/refs/heads/devel/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Poellebob/wallpaper-engine-linux-gui/refs/heads/master/install.sh | sh
 ```
 
 ### Other Distributions / Manuel
