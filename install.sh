@@ -33,6 +33,7 @@ build_linux_wallpaperengine() {
 
 install_arch() {
     git clone https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+    cd wallpaper-engine-linux-gui
 
     echo "Detected Arch Linux."
     echo "Installing linux-wallpaperengine-git and dependencies with yay..."
