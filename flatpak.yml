@@ -1,0 +1,45 @@
+app-id: com.poellebob.wallpaperengine-linux
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+command: wallpaper-engine
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=x11
+  - --device=dri
+  - --filesystem=home
+
+modules:
+  - shared-modules/glew/glew.json
+  
+  - name: wallpaperengine-linux
+    buildsystem: cmake
+    builddir: build
+    sources:
+      - type: git
+        url: https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+        branch: master
+        dest: wallpaperengine-linux
+    build-deps:
+      - libxrandr
+      - libxinerama
+      - libxcursor
+      - libxi
+      - libgl
+      - libepoxy
+      - glm
+      - mpv
+      - SDL2
+      - lz4
+      - fftw
+      - glfw
+      - freeglut
+      - pulseaudio
+    subdir: wallpaperengine-linux/linux-wallpaperengine
+    post-install:
+      - install -Dm755 ../../main.py /app/bin/wallpaper-engine
+      - install -d /app/share/wallpaperengine-linux
+      - cp -r ../../assets ../../*.py /app/share/wallpaperengine-linux/
+
