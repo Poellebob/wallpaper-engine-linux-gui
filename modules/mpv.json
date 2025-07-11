@@ -1,0 +1,26 @@
+{
+  "name": "mpv",
+  "buildsystem": "meson",
+  "builddir": true,
+  "sources": [
+    {
+      "type": "archive",
+      "url": "https://github.com/mpv-player/mpv/archive/refs/tags/v0.40.0.tar.gz",
+      "sha256": "10a0f4654f62140a6dd4d380dcf0bbdbdcf6e697556863dc499c296182f081a3"
+    }
+  ],
+  "build-deps": [
+    "glfw"
+  ],
+  "config-opts": [
+    "-Dlibmpv=true",
+    "-Dlua=luajit",
+    "-Dmanpage-build=disabled",
+    "-Dtests=false",
+    "-Ddvbin=disabled",
+    "-Duchardet=disabled",
+    "-Dlibarchive=disabled",
+    "-Dhtml-build=disabled"
+  ],
+  "cleanup": ["/include", "/lib/pkgconfig", "/share"]
+}
