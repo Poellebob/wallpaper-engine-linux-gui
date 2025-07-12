@@ -6,6 +6,7 @@ flatpak-build:
 clean:
 	rm -rf .flatpak-builder
 	rm -rf builddir
+	rm -rf repo
 
 remove:
 	flatpak remove com.poellebob.wallpaperengine-linux
