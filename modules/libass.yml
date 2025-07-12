@@ -1,4 +1,4 @@
-name: libass  # <--- This one
+name: libass
 buildsystem: meson
 builddir: true
 sources:

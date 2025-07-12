@@ -2,7 +2,8 @@ app-id: com.poellebob.wallpaperengine-linux
 runtime: org.gnome.Platform
 runtime-version: '47'
 sdk: org.gnome.Sdk
-command: wallpaper-engine
+app-arch: x86_64
+command: wallpaperengine-linux
 finish-args:
   - --share=network
   - --share=ipc
@@ -10,23 +11,28 @@ finish-args:
   - --socket=x11
   - --device=dri
   - --filesystem=home
-
+  - --socket=session-bus
+  - --socket=system-bus
+  - --talk-name=org.freedesktop.DBus
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.freedesktop.portal.*
+build-options:
+  build-args:
+    - --share=network
+  env:
+    CXXFLAGS: "-std=c++20"
+    CFLAGS: "-std=gnu11"
 modules:
+  - modules/glfw.yml
   - shared-modules/glew/glew.json
   - shared-modules/glu/glu-9.json
   - modules/libplacebo.yml
   - modules/libass.yml
   - modules/luajit.yml
   - modules/mpv.json
+  - modules/freeglut.yml
+  - modules/glm.yml
 
-  - name: freeglut
-    buildsystem: cmake
-    builddir: freeglut
-    sources:
-      - type: archive
-        url: https://netix.dl.sourceforge.net/project/freeglut/freeglut/3.6.0/freeglut-3.6.0.tar.gz
-        sha256: 9c3d4d6516fbfa0280edc93c77698fb7303e443c1aaaf37d269e3288a6c3ea52
-  
   - name: wallpaperengine-linux
     buildsystem: cmake
     builddir: build
@@ -35,19 +41,6 @@ modules:
         url: https://github.com/Poellebob/wallpaper-engine-linux-gui.git
         branch: master
         dest: wallpaperengine-linux
-        build-commands:
-        - patch -p1 --ignore-whitespace < patches/skip-cef-download.patch # patch to skip CEF download idk :( doesn't work)
-      - type: archive 
-        url: https://cef-builds.spotifycdn.com/cef_binary_135.0.17%2Bgcbc1c5b%2Bchromium-135.0.7049.52_linux64.tar.bz2
-        sha256: e4aa795be29ba362fdacb4967cf4db3f7e7986e08afb4d17f8cda66ab62f2ee3
-        dest: wallpaperengine-linux/linux-wallpaperengine/cef
-        build-commands:
-        - tar -xf cef/cef_binary_135.0.17+gcbc1c5b+chromium-135.0.7049.52_linux64.tar.bz2
-        - touch wallpaperengine-linux/linux-wallpaperengine/cef/cef_binary_135.0.17+gcbc1c5b+chromium-135.0.7049.52_linux64.tar.bz2.sha1
-        - echo 11046fe25e5529a390c842d76637affec730f0f4 > wallpaperengine-linux/linux-wallpaperengine/cef/cef_binary_135.0.17+gcbc1c5b+chromium-135.0.7049.52_linux64.tar.bz2.sha1  
-      #- type: patch
-      #  path: patches/skip-cef-download.patch
-
     build-deps:
       - libxrandr
       - libxinerama
@@ -60,12 +53,19 @@ modules:
       - SDL2
       - lz4
       - fftw
-      - glfw
       - freeglut
       - mpv
       - pulseaudio
+      - gcc
+      - g++
+      - clang
     subdir: wallpaperengine-linux/linux-wallpaperengine
     post-install:
-      - install -Dm755 ../../main.py /app/bin/wallpaper-engine
-      - install -d /app/share/wallpaperengine-linux
-      - cp -r ../../assets ../../*.py /app/share/wallpaperengine-linux/
+      - install -Dm755 ../main.py /app/opt/wallpaperengine-linux/main.py
+      - install -Dm644 ../main.ui /app/opt/wallpaperengine-linux/main.ui
+      - install -d /app/opt/wallpaperengine-linux
+      - install -Dm755 output/linux-wallpaperengine /app/lib/wallpaperengine-linux/linux-wallpaperengine || true
+      - mkdir -p /app/bin
+      - echo '#!/bin/sh' > /app/bin/wallpaperengine-linux
+      - echo 'python3 /app/opt/wallpaperengine-linux/main.py "$@"' >> /app/bin/wallpaperengine-linux
+      - chmod +x /app/bin/wallpaperengine-linux

@@ -10,6 +10,9 @@ clean:
 remove:
 	flatpak remove com.poellebob.wallpaperengine-linux
 
+run:
+	flatpak run com.poellebob.wallpaperengine-linux
+
 .PHONY: flatpak-build
 
 

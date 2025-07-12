@@ -1,0 +1,15 @@
+name: glfw
+buildsystem: cmake-ninja
+config-opts:
+  - -DGLFW_BUILD_WAYLAND=ON
+  - -DGLFW_BUILD_X11=ON
+  - -DBUILD_SHARED_LIBS=ON
+  - -DGLFW_BUILD_EXAMPLES=OFF
+  - -DGLFW_BUILD_TESTS=OFF
+  - -DGLFW_BUILD_DOCS=OFF
+cleanup:
+  - '*.a'
+sources:
+  - type: archive
+    url: https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.zip
+    sha256: b5ec004b2712fd08e8861dc271428f048775200a2df719ccf575143ba749a3e9
