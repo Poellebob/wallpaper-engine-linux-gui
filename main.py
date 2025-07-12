@@ -19,6 +19,8 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 UI_PATH = os.path.join(SCRIPT_DIR, "main.ui")
 
+IS_FLATPAK = os.path.exists("/.flatpak-info")
+
 def migrate():
     config_data = {}
 
@@ -372,6 +374,8 @@ class CliFrontend(Gtk.Application):
     def apply_walls(self, button):
         config_data = get_config()
         engine_path = config_data.get("engine_path", None)
+        if IS_FLATPAK:
+            engine_path = "/app/lib/wallpaperengine-linux/linux-wallpaperengine"
         fps = config_data.get("fps", None)
 
         # Kill all running linux-wallpaperengine processes before starting new one
@@ -388,14 +392,12 @@ class CliFrontend(Gtk.Application):
                 except Exception:
                     continue
         except ImportError:
-            # Fallback if psutil is not installed
             os.system("pkill -9 linux-wallpaperengine")
 
         if not engine_path:
             print("Engine path not set in config.json")
             return
 
-        # Get screen names from Gdk
         display = Gdk.Display.get_default()
         if not display:
             print("No display found")
@@ -406,7 +408,6 @@ class CliFrontend(Gtk.Application):
         args = [engine_path]
         for i in range(n_monitors):
             monitor = monitors.get_item(i)
-            # Use get_connector() for X11/Wayland style IDs (e.g., HDMI-1, DP-1)
             screen_id = None
             if hasattr(monitor, "get_connector"):
                 screen_id = monitor.get_connector()
@@ -424,13 +425,10 @@ class CliFrontend(Gtk.Application):
             if bg_id:
                 print(f"Screen {i} ID: {screen_id}")
                 args += ["--screen-root", screen_id, "--bg", bg_id]
-            # If no bg_id, skip this screen
 
-        # Add fps limit if set
         if fps:
             args += ["--fps", str(fps)] 
 
-        # If only engine_path is present, do nothing
         if len(args) == 1:
             print("No backgrounds selected.")
             return
@@ -468,13 +466,11 @@ class CliFrontend(Gtk.Application):
         self.update_selected_image_preview()
 
     def open_settings_widget(self, button):
-        # Create a new settings window
         settings_window = Gtk.Window(title="Settings")
         settings_window.set_default_size(400, 300)
         settings_window.set_transient_for(self.window)
         settings_window.set_modal(True)
 
-        # Create a grid layout for settings
         grid = Gtk.Grid()
         grid.set_row_spacing(10)
         grid.set_column_spacing(10)
@@ -484,10 +480,8 @@ class CliFrontend(Gtk.Application):
         grid.set_margin_end(10)
         settings_window.set_child(grid)
 
-        # Add input fields for settings
         config_data = get_config()
 
-        # Engine Path
         engine_label = Gtk.Label(label="Engine Path:")
         grid.attach(engine_label, 0, 0, 1, 1)
         engine_entry = Gtk.Entry()
@@ -495,7 +489,6 @@ class CliFrontend(Gtk.Application):
         engine_entry.set_text(config_data.get("engine_path", ""))
         grid.attach(engine_entry, 1, 0, 1, 1)
 
-        # FPS
         fps_label = Gtk.Label(label="FPS:")
         grid.attach(fps_label, 0, 1, 1, 1)
         fps_entry = Gtk.Entry()
@@ -503,37 +496,32 @@ class CliFrontend(Gtk.Application):
         fps_entry.set_text(str(config_data.get("fps", "")))
         grid.attach(fps_entry, 1, 1, 1, 1)
 
-        # Workshop Path
-        path_label = Gtk.Label(label="Workshop Path:")
-        grid.attach(path_label, 0, 2, 1, 1)
-        path_entry = Gtk.Entry()
-        path_entry.set_hexpand(True)
-        path_entry.set_text(config_data.get("path", ""))
-        grid.attach(path_entry, 1, 2, 1, 1)
+        if not IS_FLATPAK:
+            path_label = Gtk.Label(label="Workshop Path:")
+            grid.attach(path_label, 0, 2, 1, 1)
+            path_entry = Gtk.Entry()
+            path_entry.set_hexpand(True)
+            path_entry.set_text(config_data.get("path", ""))
+            grid.attach(path_entry, 1, 2, 1, 1)
 
-        # Save Button
         save_button = Gtk.Button(label="Save")
         grid.attach(save_button, 0, 3, 2, 1)
-        save_button.connect(
-            "clicked",
-            lambda btn: (
-                save_config({
-                    **get_config(),
-                    "engine_path": engine_entry.get_text(),
-                    "fps": int(fps_entry.get_text()) if fps_entry.get_text().isdigit() else None,
-                    "path": path_entry.get_text(),
-                }),
-                print("Settings saved."),
-                settings_window.close()
-            )
-        )
-
+        
+        def save_settings(btn):
+            settings = {
+                **get_config(),
+                "engine_path": engine_entry.get_text(),
+                "fps": int(fps_entry.get_text()) if fps_entry.get_text().isdigit() else None,
+            }
+            if not IS_FLATPAK:
+                settings["path"] = path_entry.get_text()
+            save_config(settings)
+            print("Settings saved.")
+            settings_window.close()
+        save_button.connect("clicked", save_settings)
         settings_window.present()
 
 def main():
-    # Check for --apply flag
-
-    # Check if the .desktop file exists
     desktop_file = os.path.expanduser("~/.local/share/applications/wallpaperengine-linux.desktop")
     desktop_dir = os.path.dirname(desktop_file)
     if not os.path.isdir(desktop_dir):
@@ -558,6 +546,26 @@ def main():
             print(f"Failed to write .desktop file: {e}")
             sys.exit(1)
     
+    if not os.path.isfile(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                if not os.path.exists("/.flatpak-info"):
+                    json.dump({"engine_path": "flatpak", 
+                               "fps": "25", 
+                               "path": "~/.steam/steam/steamapps/workshop/content/431960/"}, f, indent=2)
+                elif os.path.exists("/etc/arch-release"):
+                    json.dump({"engine_path": "/usr/bin/linux-wallpaperengine", 
+                               "fps": "25", 
+                               "path": "~/.steam/steam/steamapps/workshop/content/431960/"}, f, indent=2)
+                else:
+                    json.dump({"engine_path": "~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine", 
+                               "fps": "25", 
+                               "path": "~/.steam/steam/steamapps/workshop/content/431960/"}, f, indent=2)
+            print(f"Created config file at {CONFIG_PATH}")
+        except Exception as e:
+            print(f"Failed to write config.json: {e}")
+            sys.exit(1)
+
     if "--help" in sys.argv or "-h" in sys.argv:
         print("Usage: python main.py [--apply] [--kill]")
         print("Options:")
@@ -574,7 +582,6 @@ def main():
         print("Applied wallpapers and exited.")
         sys.exit(0)
 
-    # Check for --kill flag
     if "--kill" in sys.argv:
         class DummyButton: pass
         app = CliFrontend()

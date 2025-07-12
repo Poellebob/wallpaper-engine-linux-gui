@@ -132,16 +132,6 @@ esac
 mkdir -p ~/.config/wallpaperengine-linux
 mkdir -p ~/.config/wallpaperengine-linuxlinux-wallpaperengine
 
-if [ ! -f ~/.config/wallpaperengine-linux/config.json ]; then
-    cat > ~/.config/wallpaperengine-linux/config.json << EOF 
-    {
-        "path": "~/.steam/steam/steamapps/workshop/content/431960/",
-        "engine_path": "$engine_path",
-        "fps": 25
-    }
-EOF
-fi
-
 mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
 cp icon.png ~/.local/share/wallpaperengine-linux/
