@@ -11,7 +11,7 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 - Set framerate and engine path via configuration.
 - CLI flags for automation (`--apply`, `--kill`, `--new-desktop`).
 
-## Installation (arch, debian based, fedora and suse)
+## Installation (arch, debian based, fedora)
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Poellebob/wallpaper-engine-linux-gui/refs/heads/master/install.sh | sh
 ```
@@ -30,23 +30,6 @@ Then run:
 ```sh
 python3 main.py --new-desktop
 ```
-
-## Configuration
-
-Edit `config.ini`:
-
-```ini
-[config]
-first_run=true
-path=~/.steam/steam/steamapps/workshop/content/431960/
-engine_path=/usr/bin/linux-wallpaperengine
-fps=25
-```
-
-- `path`: Path to your Steam Workshop wallpapers.
-- `engine_path`: Path to the linux-wallpaperengine executable.
-- `fps`: Framerate limit for wallpapers.
-
 
 ## Usage
 
