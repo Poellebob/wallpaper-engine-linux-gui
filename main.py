@@ -377,6 +377,7 @@ class CliFrontend(Gtk.Application):
         if IS_FLATPAK:
             engine_path = "/app/lib/wallpaperengine-linux/linux-wallpaperengine"
         fps = config_data.get("fps", None)
+        fill = config_data.get("fill", False)
 
         # Kill all running linux-wallpaperengine processes before starting new one
         try:
@@ -429,9 +430,8 @@ class CliFrontend(Gtk.Application):
         if fps:
             args += ["--fps", str(fps)] 
 
-        if len(args) == 1:
-            print("No backgrounds selected.")
-            return
+        if fill:
+            args += ["--scaling", "fill" if fill else "default"]
 
         print("Running:", " ".join(args))
         try:
@@ -504,14 +504,21 @@ class CliFrontend(Gtk.Application):
         path_entry.set_text(config_data.get("path", ""))
         grid.attach(path_entry, 1, 2, 1, 1)
 
+        fill_lable = Gtk.Label(label="Fill: ")
+        grid.attach(fill_lable, 0, 3, 1, 1)
+        fill_entry = Gtk.CheckButton()
+        fill_entry.set_active(config_data.get("fill", False))
+        grid.attach(fill_entry, 1, 3, 1, 1)
+
         save_button = Gtk.Button(label="Save")
-        grid.attach(save_button, 0, 3, 2, 1)
+        grid.attach(save_button, 0, 4, 2, 1)
         
         def save_settings(btn):
             settings = {
                 **get_config(),
                 "engine_path": engine_entry.get_text(),
                 "fps": int(fps_entry.get_text()) if fps_entry.get_text().isdigit() else None,
+                "fill": bool(fill_entry.get_active())
             }
             if not IS_FLATPAK:
                 settings["path"] = path_entry.get_text()
