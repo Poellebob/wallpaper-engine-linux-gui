@@ -531,13 +531,15 @@ class CliFrontend(Gtk.Application):
 def main():
     desktop_file = os.path.expanduser("~/.local/share/applications/wallpaperengine-linux.desktop")
     desktop_dir = os.path.dirname(desktop_file)
-    if not os.path.isdir(desktop_dir):
-        try:
-            os.makedirs(desktop_dir, exist_ok=True)
-        except Exception as e:
-            print(f"Failed to create directory {desktop_dir}: {e}")
-            sys.exit(1)
-    if not os.path.isfile(desktop_file) or "--new-desktop" in sys.argv:
+
+    # Creates/updates the desktop file and create dir ~/.local/share/applications if missing
+    if "--new-desktop" in sys.argv:
+        if not os.path.isdir(desktop_dir):
+            try:
+                os.makedirs(desktop_dir, exist_ok=True)
+            except Exception as e:
+                print(f"Failed to create directory {desktop_dir}: {e}")
+                sys.exit(1)
         try:
             with open(desktop_file, "w", encoding="utf-8") as f:
                 f.write("[Desktop Entry]\n")
