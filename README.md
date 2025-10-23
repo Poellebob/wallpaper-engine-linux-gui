@@ -28,14 +28,14 @@ Install the following dependencies manually:
 
 Then run:
 ```sh
-python3 main.py --new-desktop
+welg --new-desktop
 ```
 
 ## Usage
 
 1. Run the application:
     ```sh
-    python3 main.py
+    welg
     ```
 2. Select a screen from the dropdown.
 3. Click a wallpaper to assign it to the selected screen.
@@ -52,15 +52,15 @@ python3 main.py --new-desktop
 
 Example:
 ```sh
-python3 main.py --apply
-python3 main.py --kill
-python3 main.py --new-desktop
+welg --apply
+welg main.py --kill
+welg main.py --new-desktop
 ```
 
 ### Hyprland (startup exaple)
 Apply walpapers without starting the gui
 ```
-exec-once = pyton3 ~/.local/share/wallpaperengine-linux/main.py --apply 
+exec-once = welg --apply 
 ```
 
 ## Desktop Integration
