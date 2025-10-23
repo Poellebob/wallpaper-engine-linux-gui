@@ -144,6 +144,10 @@ if [ -f ~/.local/share/wallpaperengine-linux/main.py ]; then
     python3 ~/.local/share/wallpaperengine-linux/main.py --new-desktop
 fi
 
+mkdir -p ~/.local/bin
+touch ~/.local/bin/welg
+echo "#!/bin/bash \n python3 main.py \"$@\"" > ~/.local/bin/welg
+
 echo "You can now run the wallpaper engine linux from the applications menu."
 
 cd ..
