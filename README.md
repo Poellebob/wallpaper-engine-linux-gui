@@ -53,8 +53,8 @@ welg --new-desktop
 Example:
 ```sh
 welg --apply
-welg main.py --kill
-welg main.py --new-desktop
+welg --kill
+welg --new-desktop
 ```
 
 ### Hyprland (startup exaple)
