@@ -31,6 +31,8 @@ Then run:
 welg --new-desktop
 ```
 
+If it says that welg is not a command consider adding `export PATH="$HOME/.config/bin:$PATH"` to your rc file
+
 ## Usage
 
 1. Run the application:
