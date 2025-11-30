@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "This will set up Wallpaper Engine Linux and its dependencies."
 
@@ -13,7 +13,7 @@ fi
 engine_path=/usr/bin/linux-wallpaperengine
 
 build_linux_wallpaperengine() {
-    git clone --branch devel --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+    git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
     cd wallpaper-engine-linux-gui/linux-wallpaperengine
     mkdir build && cd build
     cmake ..
@@ -32,12 +32,12 @@ build_linux_wallpaperengine() {
 }
 
 install_arch() {
-    git clone --branch devel https://github.com/Poellebob/wallpaper-engine-linux-gui.git
+    git clone https://github.com/Poellebob/wallpaper-engine-linux-gui.git
     cd wallpaper-engine-linux-gui
 
     echo "Detected Arch Linux."
     echo "Installing linux-wallpaperengine-git and dependencies with yay..."
-    yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
+    yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2 base-devil cmake
     engine_path=$(which linux-wallpaperengine)
 }
 
@@ -130,17 +130,6 @@ case "$OS_ID" in
 esac
 
 mkdir -p ~/.config/wallpaperengine-linux
-mkdir -p ~/.config/wallpaperengine-linuxlinux-wallpaperengine
-
-if [ ! -f ~/.config/wallpaperengine-linux/config.json ]; then
-    cat > ~/.config/wallpaperengine-linux/config.json << EOF 
-    {
-        "path": "~/.steam/steam/steamapps/workshop/content/431960/",
-        "engine_path": "$engine_path",
-        "fps": 25
-    }
-EOF
-fi
 
 mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
@@ -153,6 +142,45 @@ echo "This will now make a .desktop file for the wallpaper engine linux."
 if [ -f ~/.local/share/wallpaperengine-linux/main.py ]; then
     python3 ~/.local/share/wallpaperengine-linux/main.py --new-desktop
 fi
+
+# Check if ~/.local/bin is already in PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo "~/.local/bin is NOT in your PATH."
+    read -p "Do you want me to add it to your shell config? [y/N]: " addpath
+
+    if [[ "$addpath" =~ ^[yY]$ ]]; then
+        echo "Adding ~/.local/bin to PATH..."
+
+        if [ -f "$HOME/.bashrc" ]; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+            echo "Added to ~/.bashrc"
+        fi
+
+        if [ -f "$HOME/.zshrc" ]; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+            echo "Added to ~/.zshrc"
+        fi
+
+        export PATH="$HOME/.local/bin:$PATH"
+
+    else
+        echo "Not modifying your config."
+        echo
+        echo "If you change your mind, add this line to your shell config:"
+        echo 'export PATH="$HOME/.local/bin:$PATH"'
+    fi
+else
+    echo "~/.local/bin is already in your PATH."
+fi
+
+mkdir -p ~/.local/bin
+
+cat > ~/.local/bin/welg << 'EOF'
+#!/usr/bin/env bash
+python3 ~/.local/share/wallpaperengine-linux/main.py "$@"
+EOF
+
+chmod +x ~/.local/bin/welg
 
 echo "You can now run the wallpaper engine linux from the applications menu."
 
