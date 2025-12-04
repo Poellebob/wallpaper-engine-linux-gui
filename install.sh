@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "This will set up Wallpaper Engine Linux and its dependencies."
 
@@ -22,6 +22,7 @@ else
 fi
 
 engine_path=/usr/bin/linux-wallpaperengine
+mkdir -p ~/.local/share/wallpaperengine-linux
 
 build_linux_wallpaperengine() {
   git clone --recurse-submodules -b "$BRANCH" https://github.com/Poellebob/wallpaper-engine-linux-gui.git
@@ -31,13 +32,15 @@ build_linux_wallpaperengine() {
   make
 
   if [ $? -ne 0 ]; then
-    echo "Build failed. Please check the output above for errors."
-    exit 1
+      echo "Build failed. Please check the output above for errors."
+      exit 1
   else
-    echo "Build completed successfully."
+      echo "Build completed successfully."
   fi
-
+  
+  mkdir -p ~/.local/share/wallpaperengine-linux/linux-wallpaperengine
   cp -r ./output/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
+  chmod +x ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
   engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
   cd ../..
 }
@@ -48,7 +51,7 @@ install_arch() {
 
   echo "Detected Arch Linux."
   echo "Installing linux-wallpaperengine-git and dependencies with yay..."
-  yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
+  yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2 base-devil cmake
   engine_path=$(which linux-wallpaperengine)
 }
 
@@ -141,9 +144,17 @@ case "$OS_ID" in
 esac
 
 mkdir -p ~/.config/wallpaperengine-linux
-mkdir -p ~/.config/wallpaperengine-linuxlinux-wallpaperengine
+touch ~/.config/wallpaperengine-linux/config.json
+cat > ~/.config/wallpaperengine-linux/config.json << EOF
+{
+  "engine_path": "$engine_path",
+  "fps": 25,
+  "path": "$HOME/.steam/steam/steamapps/workshop/content/431960/",
+  "fill": false,
+  "MATURE_CONTENT": false
+}
+EOF
 
-mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
 cp icon.png ~/.local/share/wallpaperengine-linux/
 cp main.ui ~/.local/share/wallpaperengine-linux/
@@ -156,8 +167,66 @@ if [ -f ~/.local/share/wallpaperengine-linux/main.py ]; then
 fi
 
 mkdir -p ~/.local/bin
+# Check if ~/.local/bin is already in PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo "~/.local/bin is NOT in your PATH."
+    read -p "Do you want me to add it to your shell config? [y/N]: " addpath
+
+    if [[ "$addpath" =~ ^[yY]$ ]]; then
+        echo "Adding ~/.local/bin to PATH..."
+
+        if [ -f "$HOME/.bashrc" ]; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+            echo "Added to ~/.bashrc"
+        fi
+
+        if [ -f "$HOME/.zshrc" ]; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+            echo "Added to ~/.zshrc"
+        fi
+
+        export PATH="$HOME/.local/bin:$PATH"
+
+    else
+        echo "Not modifying your config."
+        echo
+        echo "If you change your mind, add this line to your shell config:"
+        echo 'export PATH="$HOME/.local/bin:$PATH"'
+    fi
+else
+    echo "~/.local/bin is already in your PATH."
+fi
+
 touch ~/.local/bin/welg
-echo "#!/bin/bash \n python3 main.py \"$@\"" > ~/.local/bin/welg
+cat > ~/.local/bin/welg << 'EOF'
+#!/usr/bin/env bash
+
+MAIN_SCRIPT="$HOME/.local/share/wallpaperengine-linux/main.py"
+
+# Check if --startup-command is in arguments
+if [[ " $* " == *" --startup-command "* ]]; then
+    # Echo the special startup command
+    echo "python3 $HOME/.local/share/home/guest/.local/share/wallpaperengine-linux/main.py --apply"
+
+    # Remove --startup-command from arguments
+    args=()
+    for arg in "$@"; do
+        if [[ "$arg" != "--startup-command" ]]; then
+            args+=("$arg")
+        fi
+    done
+
+    # Only run the main script if there are other arguments
+    if [[ ${#args[@]} -gt 0 ]]; then
+        python3 "$MAIN_SCRIPT" "${args[@]}"
+    fi
+else
+    # Run normally if --startup-command is not present
+    python3 "$MAIN_SCRIPT" "$@"
+fi
+EOF
+
+chmod +x ~/.local/bin/welg
 
 echo "You can now run the wallpaper engine linux from the applications menu."
 
