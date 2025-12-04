@@ -143,6 +143,16 @@ case "$OS_ID" in
 esac
 
 mkdir -p ~/.config/wallpaperengine-linux
+touch ~/.config/wallpaperengine-linux/config.json
+cat > ~/.config/wallpaperengine-linux/config.json << EOF
+{
+  "engine_path": "$engine_path",
+  "fps": 25,
+  "path": "$HOME/.steam/steam/steamapps/workshop/content/431960/",
+  "fill": false,
+  "MATURE_CONTENT": false
+}
+EOF
 
 cp main.py ~/.local/share/wallpaperengine-linux/
 cp icon.png ~/.local/share/wallpaperengine-linux/
