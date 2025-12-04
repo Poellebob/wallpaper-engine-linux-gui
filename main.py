@@ -87,6 +87,9 @@ class CliFrontend(Gtk.Application):
         self.window = builder.get_object("main")
         self.window.set_application(app)
         self.window.connect("close-request", self.on_close_request)
+        
+        # Set initial window size
+        self.window.set_default_size(800, 600)
 
         # Set sidebar width (paned position)
         paned = self.window.get_child()
