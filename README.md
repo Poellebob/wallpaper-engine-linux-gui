@@ -13,7 +13,7 @@ A GTK-based frontend for managing and applying wallpapers using [linux-wallpaper
 
 ## Installation (arch based, debian based, fedora)
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Poellebob/wallpaper-engine-linux-gui/refs/heads/master/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Poellebob/wallpaper-engine-linux-gui/refs/heads/devel/install.sh | sh
 ```
 
 ### Other Distributions / Manuel
