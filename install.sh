@@ -197,6 +197,7 @@ else
     echo "~/.local/bin is already in your PATH."
 fi
 
+touch ~/.local/bin/welg
 cat > ~/.local/bin/welg << 'EOF'
 #!/usr/bin/env bash
 
