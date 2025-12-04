@@ -29,6 +29,7 @@ build_linux_wallpaperengine() {
     
     mkdir -p ~/.local/share/wallpaperengine-linux/linux-wallpaperengine
     cp -r ./output/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
+    chmod +x ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
     engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
     cd ../..
 }
