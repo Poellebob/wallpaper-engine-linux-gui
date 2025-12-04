@@ -166,6 +166,7 @@ if [ -f ~/.local/share/wallpaperengine-linux/main.py ]; then
   python3 ~/.local/share/wallpaperengine-linux/main.py --new-desktop
 fi
 
+mkdir -p ~/.local/bin
 # Check if ~/.local/bin is already in PATH
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     echo "~/.local/bin is NOT in your PATH."
@@ -195,8 +196,6 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
 else
     echo "~/.local/bin is already in your PATH."
 fi
-
-mkdir -p ~/.local/bin
 
 cat > ~/.local/bin/welg << 'EOF'
 #!/usr/bin/env bash
