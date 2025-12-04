@@ -200,7 +200,30 @@ mkdir -p ~/.local/bin
 
 cat > ~/.local/bin/welg << 'EOF'
 #!/usr/bin/env bash
-python3 ~/.local/share/wallpaperengine-linux/main.py "$@"
+
+MAIN_SCRIPT="$HOME/.local/share/wallpaperengine-linux/main.py"
+
+# Check if --startup-command is in arguments
+if [[ " $* " == *" --startup-command "* ]]; then
+    # Echo the special startup command
+    echo "python3 $HOME/.local/share/home/guest/.local/share/wallpaperengine-linux/main.py --apply"
+
+    # Remove --startup-command from arguments
+    args=()
+    for arg in "$@"; do
+        if [[ "$arg" != "--startup-command" ]]; then
+            args+=("$arg")
+        fi
+    done
+
+    # Only run the main script if there are other arguments
+    if [[ ${#args[@]} -gt 0 ]]; then
+        python3 "$MAIN_SCRIPT" "${args[@]}"
+    fi
+else
+    # Run normally if --startup-command is not present
+    python3 "$MAIN_SCRIPT" "$@"
+fi
 EOF
 
 chmod +x ~/.local/bin/welg
