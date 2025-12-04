@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "This will set up Wallpaper Engine Linux and its dependencies."
 
@@ -37,7 +37,7 @@ install_arch() {
 
     echo "Detected Arch Linux."
     echo "Installing linux-wallpaperengine-git and dependencies with yay..."
-    yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2
+    yay -Sy --needed linux-wallpaperengine-git git python python-gobject gtk4 gobject-introspection gtk4 gdk-pixbuf2 base-devil cmake
     engine_path=$(which linux-wallpaperengine)
 }
 
@@ -130,7 +130,6 @@ case "$OS_ID" in
 esac
 
 mkdir -p ~/.config/wallpaperengine-linux
-mkdir -p ~/.config/wallpaperengine-linuxlinux-wallpaperengine
 
 mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
@@ -145,8 +144,43 @@ if [ -f ~/.local/share/wallpaperengine-linux/main.py ]; then
 fi
 
 mkdir -p ~/.local/bin
-touch ~/.local/bin/welg
-echo "#!/bin/bash \n python3 main.py \"$@\"" > ~/.local/bin/welg
+
+# Check if ~/.local/bin is already in PATH
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo "~/.local/bin is NOT in your PATH."
+    read -p "Do you want me to add it to your shell config? [y/N]: " addpath
+
+    if [[ "$addpath" =~ ^[yY]$ ]]; then
+        echo "Adding ~/.local/bin to PATH..."
+
+        if [ -f "$HOME/.bashrc" ]; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+            echo "Added to ~/.bashrc"
+        fi
+
+        if [ -f "$HOME/.zshrc" ]; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+            echo "Added to ~/.zshrc"
+        fi
+
+        export PATH="$HOME/.local/bin:$PATH"
+
+    else
+        echo "Not modifying your config."
+        echo
+        echo "If you change your mind, add this line to your shell config:"
+        echo 'export PATH="$HOME/.local/bin:$PATH"'
+    fi
+else
+    echo "~/.local/bin is already in your PATH."
+fi
+
+cat > ~/.local/bin/welg << 'EOF'
+#!/usr/bin/env bash
+python3 ~/.local/share/wallpaperengine-linux/main.py "$@"
+EOF
+
+chmod +x ~/.local/bin/welg
 
 echo "You can now run the wallpaper engine linux from the applications menu."
 
