@@ -11,6 +11,7 @@ else
 fi
 
 engine_path=/usr/bin/linux-wallpaperengine
+mkdir -p ~/.local/share/wallpaperengine-linux
 
 build_linux_wallpaperengine() {
     git clone --recurse-submodules https://github.com/Poellebob/wallpaper-engine-linux-gui.git
@@ -25,7 +26,8 @@ build_linux_wallpaperengine() {
     else
         echo "Build completed successfully."
     fi
-
+    
+    mkdir -p ~/.local/share/wallpaperengine-linux/linux-wallpaperengine
     cp -r ./output/* ~/.local/share/wallpaperengine-linux/linux-wallpaperengine/
     engine_path=~/.local/share/wallpaperengine-linux/linux-wallpaperengine/linux-wallpaperengine
     cd ../..
@@ -131,7 +133,6 @@ esac
 
 mkdir -p ~/.config/wallpaperengine-linux
 
-mkdir -p ~/.local/share/wallpaperengine-linux
 cp main.py ~/.local/share/wallpaperengine-linux/
 cp icon.png ~/.local/share/wallpaperengine-linux/
 cp main.ui ~/.local/share/wallpaperengine-linux/
