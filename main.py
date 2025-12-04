@@ -399,6 +399,10 @@ class CliFrontend(Gtk.Application):
             print("Engine path not set in config.json")
             return
 
+        engine_dir = os.path.dirname(engine_path)
+        if os.path.exists(os.path.join(engine_dir, 'libcef.so')):
+            os.environ['LD_LIBRARY_PATH'] = engine_dir + ':' + os.environ.get('LD_LIBRARY_PATH', '')
+        
         display = Gdk.Display.get_default()
         if not display:
             print("No display found")
