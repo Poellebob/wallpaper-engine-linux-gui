@@ -64,7 +64,7 @@ welg --new-desktop
 ### Hyprland (startup exaple)
 Apply walpapers without starting the gui
 ```
-exec-once = welg --apply 
+exec-once = ~/.local/bin/welg --apply 
 ```
 
 ## Desktop Integration
