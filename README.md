@@ -51,6 +51,7 @@ If it says that welg is not a command consider adding `export PATH="$HOME/.confi
 - `--apply` : Apply the selected wallpapers and exit (no GUI).
 - `--kill` : Kill all running linux-wallpaperengine processes and exit.
 - `--new-desktop` : Create or update the .desktop file for the application and exit.
+- `--startup-command` : Echo startup command.
 - `--help` or `-h` : Show help message.
 
 Example:
