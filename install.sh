@@ -206,7 +206,7 @@ MAIN_SCRIPT="$HOME/.local/share/wallpaperengine-linux/main.py"
 # Check if --startup-command is in arguments
 if [[ " $* " == *" --startup-command "* ]]; then
     # Echo the special startup command
-    echo "python3 $HOME/.local/share/wallpaperengine-linux/main.py --apply"
+    echo "$HOME/.local/bin/welg --apply"
 
     # Remove --startup-command from arguments
     args=()
