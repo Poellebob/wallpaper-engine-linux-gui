@@ -69,4 +69,4 @@ exec-once = ~/.local/bin/welg --apply
 
 ## Desktop Integration
 
-The install script (`install.sh`) will create a `.desktop` file in `~/.local/share/applications/wallpaperengine-linux.desktop` so you can launch the app from your applications menu.
+The install script (`install.sh`) will create `~/.local/share/applications/wallpaperengine-linux.desktop` so you can launch the app from your applications menu.
