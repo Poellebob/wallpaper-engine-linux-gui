@@ -102,7 +102,7 @@ class CliFrontend(Gtk.Application):
         self.populate_images()
 
         self.display_selector = self.builder.get_object("display_selector")
-        self.selected_image_preview = Gtk.Image()
+        self.selected_image_preview = Gtk.Picture()
         sidebar_box = self.display_selector.get_parent()
         sidebar_box.append(self.selected_image_preview)
         self.selected_image_preview.show()
@@ -241,13 +241,13 @@ class CliFrontend(Gtk.Application):
                 # Render the preview image
                 if img_path.lower().endswith(".gif"):
                     loader = GdkPixbuf.PixbufAnimation.new_from_file(img_path)
-                    pixbuf = loader.get_static_image()
+                    pixbuf = loader.get_static_picture()
                     width = pixbuf.get_width()
                     height = pixbuf.get_height()
                     scale_factor = target_width / width
                     new_height = max(1, int(height * scale_factor))
                     scaled_pixbuf = pixbuf.scale_simple(target_width, new_height, GdkPixbuf.InterpType.BILINEAR)
-                    image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+                    image = Gtk.Picture.set_for_pixbuf(scaled_pixbuf)
                     image.set_size_request(target_width, new_height)
                 else:
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file(img_path)
@@ -255,8 +255,8 @@ class CliFrontend(Gtk.Application):
                     height = pixbuf.get_height()
                     scale_factor = target_width / width
                     new_height = max(1, int(height * scale_factor))
-                    scaled_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(img_path, width=target_width, height=new_height, preserve_aspect_ratio=True)
-                    image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+                    scaled_pixbuf = pixbuf.scale_simple(target_width, new_height, GdkPixbuf.InterpType.BILINEAR)
+                    image = Gtk.Picture.new_for_pixbuf(scaled_pixbuf)
                     image.set_size_request(target_width, new_height)
 
                 button = Gtk.Button()
@@ -314,7 +314,7 @@ class CliFrontend(Gtk.Application):
     def update_selected_image_preview(self):
         screen_id = self.display_selector.get_active()
         if screen_id < 0:
-            self.selected_image_preview.clear()
+            self.selected_image_preview.set_paintable(None)
             return
 
         # Load configuration from config.json
@@ -322,19 +322,19 @@ class CliFrontend(Gtk.Application):
         screen_config = config_data.get(str(screen_id), {})
         parent_folder = screen_config.get("ID")
         if not parent_folder:
-            self.selected_image_preview.clear()
+            self.selected_image_preview.set_paintable(None)
             return
 
         # Find the preview image for this parent folder
         workshop_base = get_walls_path()
         if not workshop_base:
-            self.selected_image_preview.clear()
+            self.selected_image_preview.set_paintable(None)
             return
 
         subdir = os.path.join(os.path.expanduser(workshop_base), parent_folder)
         project_json_path = os.path.join(subdir, "project.json")
         if not os.path.isfile(project_json_path):
-            self.selected_image_preview.clear()
+            self.selected_image_preview.set_paintable(None)
             return
 
         try:
@@ -342,12 +342,12 @@ class CliFrontend(Gtk.Application):
                 project_data = json.load(f)
             preview_name = project_data.get("preview")
             if not preview_name:
-                self.selected_image_preview.clear()
+                self.selected_image_preview.set_paintable(None)
                 return
 
             img_path = os.path.join(subdir, preview_name)
             if not os.path.isfile(img_path):
-                self.selected_image_preview.clear()
+                self.selected_image_preview.set_paintable(None)
                 return
 
             # Render the preview image
@@ -360,7 +360,8 @@ class CliFrontend(Gtk.Application):
                 scale_factor = target_width / width
                 new_height = max(1, int(height * scale_factor))
                 scaled_pixbuf = pixbuf.scale_simple(target_width, new_height, GdkPixbuf.InterpType.BILINEAR)
-                self.selected_image_preview.set_from_pixbuf(scaled_pixbuf)
+                texture = Gdk.Texture.new_for_pixbuf(scaled_pixbuf)
+                self.selected_image_preview.set_paintable(texture)
                 self.selected_image_preview.set_size_request(target_width, new_height)
             else:
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file(img_path)
@@ -368,11 +369,12 @@ class CliFrontend(Gtk.Application):
                 height = pixbuf.get_height()
                 scale_factor = target_width / width
                 new_height = max(1, int(height * scale_factor))
-                scaled_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(img_path, width=target_width, height=new_height, preserve_aspect_ratio=True)
-                self.selected_image_preview.set_from_pixbuf(scaled_pixbuf)
+                scaled_pixbuf = pixbuf.scale_simple(target_width, new_height, GdkPixbuf.InterpType.BILINEAR)
+                texture = Gdk.Texture.new_for_pixbuf(scaled_pixbuf)
+                self.selected_image_preview.set_paintable(texture)
                 self.selected_image_preview.set_size_request(target_width, new_height)
         except Exception:
-            self.selected_image_preview.clear()
+            self.selected_image_preview.set_paintable(None)
 
     def apply_walls(self, button):
         config_data = get_config()
